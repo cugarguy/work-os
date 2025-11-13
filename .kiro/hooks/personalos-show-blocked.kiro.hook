@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "PersonalOS Show Blocked Tasks",
+  "description": "Show tasks that are blocked and need attention",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "#Tasks/\n\n1. Use list_tasks with status=b to show blocked tasks\n2. For each blocked task, show its context\n3. Ask what's blocking it and suggest next steps to unblock\n4. If no blocked tasks, confirm and suggest checking started tasks"
+  }
+}

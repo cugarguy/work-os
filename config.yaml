@@ -1,0 +1,102 @@
+# PersonalOS Configuration
+
+# Task categories
+categories:
+  - technical      # Build, fix, configure
+  - outreach       # Communicate, meet
+  - research       # Learn, analyze
+  - writing        # Draft, document
+  - admin          # Operations, finance, logistics
+  - personal       # Health, routines
+  - other          # Everything else
+
+# Priority levels
+priorities:
+  - P0  # Critical/Urgent - Must do THIS WEEK
+  - P1  # Important - This month
+  - P2  # Normal - Scheduled work
+  - P3  # Low - Nice to have
+
+# Status codes
+statuses:
+  n: not_started
+  s: started
+  b: blocked
+  d: done
+
+# Deduplication settings
+deduplication:
+  similarity_threshold: 0.6  # How similar before flagging (0-1)
+  check_categories: true     # Consider category in matching
+  check_keywords: true       # Use keyword overlap
+
+# Priority limits (warning thresholds)
+priority_limits:
+  P0: 3  # Warn if more than 3 P0 tasks
+  P1: 7  # Warn if more than 7 P1 tasks
+
+# Task aging (in days)
+task_aging:
+  prune_completed_after: 30  # Delete done tasks after 30 days
+  flag_stale_after: 14       # Flag inactive tasks after 14 days
+
+# Category keywords for auto-categorization
+category_keywords:
+  technical:
+    - code
+    - api
+    - database
+    - deploy
+    - fix
+    - bug
+    - implement
+    - develop
+    - debug
+    - server
+    - dashboard
+    - dataset
+    - migration
+  outreach:
+    - email
+    - contact
+    - reach
+    - meeting
+    - call
+    - follow
+    - introduce
+    - connect
+    - 1:1
+    - alignment
+  research:
+    - research
+    - study
+    - learn
+    - investigate
+    - analyze
+    - explore
+    - understand
+    - evaluate
+    - review
+    - documentation
+  writing:
+    - write
+    - draft
+    - document
+    - blog
+    - article
+    - report
+    - proposal
+    - outline
+    - strategy
+    - spec
+    - PRFAQ
+  admin:
+    - schedule
+    - organize
+    - expense
+    - invoice
+    - calendar
+    - filing
+    - spreadsheet
+    - metrics
+    - WBR

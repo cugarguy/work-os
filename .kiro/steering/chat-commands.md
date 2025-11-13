@@ -32,21 +32,49 @@ Execute the task completion workflow:
 3. Use update_task_status to mark it 'd'
 4. Confirm and show remaining P0/P1 tasks
 
-## "show priorities" or "what's urgent" or "p0 tasks"
+## "show priorities" or "what's urgent" or "p0 tasks" or "show me today's priorities"
 Execute the priority view workflow:
 1. Use list_tasks with priority=P0,P1
 2. Group by priority
 3. Show estimated time for each level
 4. Keep it concise
 
-## "weekly review" or "what did I accomplish"
+## "weekly review" or "what did I accomplish" or "clean up old tasks"
 Execute the weekly review workflow:
 1. Use list_tasks with include_done=true
 2. Summarize accomplishments tied to goals
 3. Use get_task_summary for current workload
 4. Use check_priority_limits to check if overloaded
-5. Ask about pruning old completed tasks
+5. Ask about pruning old completed tasks (use prune_completed_tasks)
 6. Suggest goals needing attention
+
+## "show blocked tasks" or "what's blocked"
+Execute the blocked tasks workflow:
+1. Use list_tasks with status=b
+2. Show blocked tasks with their context
+3. Ask what's blocking each one
+4. Suggest next steps to unblock
+
+## "tasks for goal" or "show tasks supporting [goal]"
+Execute the goal-aligned tasks workflow:
+1. Read GOALS.md to understand the goal
+2. Use list_tasks to get all active tasks
+3. Filter tasks that reference this goal in Context
+4. Show how these tasks advance the goal
+
+## "backup tasks" or "backup my tasks"
+Execute the backup workflow:
+1. Create backups/tasks-[YYYY-MM-DD-HH-MM]/ directory
+2. Copy all files from Tasks/ to backup folder
+3. Confirm backup created with file count
+4. List the 5 most recent backups
+
+## "push to git" or "git push" or "save to git"
+Execute the git push workflow:
+1. Run: git add Tasks/ GOALS.md BACKLOG.md Knowledge/
+2. Run: git commit -m "Update tasks - [current date]"
+3. Run: git push
+4. Confirm push successful and show commit hash
 
 ## Important
 - Always use the MCP tools (don't just read files manually)

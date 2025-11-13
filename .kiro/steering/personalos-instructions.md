@@ -44,7 +44,8 @@ You are helping manage tasks using the PersonalOS system. This workspace uses a 
 ## Task Template
 
 Every task should have:
-- YAML frontmatter with title, category, priority, status, estimated_time
+- YAML frontmatter with: title, category, priority, status, created_date, estimated_time
+- Optional: due_date, resource_refs (links to Knowledge/ files)
 - Context section tying to GOALS.md
 - Next Actions checklist
 - Progress Log with dates
