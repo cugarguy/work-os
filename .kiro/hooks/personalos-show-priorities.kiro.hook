@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "PersonalOS Show Priorities",
+  "description": "Quick view of P0 and P1 tasks",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "#Tasks/\n\n1. Use list_tasks with priority=P0,P1\n2. Group by priority\n3. Show estimated time for each priority level\n4. Keep it concise - just titles and categories"
+  }
+}

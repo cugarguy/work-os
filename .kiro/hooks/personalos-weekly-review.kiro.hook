@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "PersonalOS Weekly Review",
+  "description": "Review completed work and clean up old tasks",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "#GOALS.md\n#Tasks/\n\n1. Use list_tasks with include_done=true to show completed tasks from this week\n2. Summarize what I accomplished and how it ties to my goals\n3. Use get_task_summary to show current workload\n4. Use check_priority_limits to see if I'm overloaded\n5. Ask if I want to prune_completed_tasks older than 7 days\n6. Suggest any goals that need more attention next week"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "personal-os": {
+      "command": "python3.11",
+      "args": ["core/mcp/server.py"],
+      "disabled": false,
+      "autoApprove": [
+        "list_tasks",
+        "get_task_summary",
+        "process_backlog",
+        "process_backlog_with_dedup",
+        "create_task",
+        "update_task_status",
+        "clear_backlog",
+        "check_priority_limits",
+        "get_system_status",
+        "prune_completed_tasks"
+      ]
+    }
+  }
+}

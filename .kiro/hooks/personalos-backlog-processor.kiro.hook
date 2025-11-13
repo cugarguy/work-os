@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "PersonalOS Backlog Processor",
+  "description": "Triggers when BACKLOG.md is saved to process tasks using instructions from CLAUDE.md with context from goals, tasks, and knowledge base",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "#CLAUDE.md\n#BACKLOG.md\n#GOALS.md\n#Tasks/\n#Knowledge/\n\nProcess the backlog following the instructions in CLAUDE.md. Important:\n\n1. Read BACKLOG.md and extract the FIRST actionable item only\n2. Use process_backlog_with_dedup to check if it's a duplicate\n3. Ask me ONE question about this item (category, priority, details, etc.)\n4. Wait for my response\n5. After I answer, process the next item\n\nWork through items ONE AT A TIME. Do not batch questions. Process item by item until the backlog is empty."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "PersonalOS Daily Focus",
+  "description": "Suggests what to work on today based on priorities and goals",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "#GOALS.md\n#Tasks/\n\nBased on my goals and current tasks:\n\n1. Use list_tasks to show P0 and P1 tasks\n2. Consider my quarterly objectives from GOALS.md\n3. Suggest 1-3 tasks I should focus on today\n4. Explain why each task matters for my goals\n5. Flag any blocked tasks that need attention\n\nBe concise and actionable."
+  }
+}
