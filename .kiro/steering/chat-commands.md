@@ -69,12 +69,12 @@ Execute the backup workflow:
 3. Confirm backup created with file count
 4. List the 5 most recent backups
 
-## "push to git" or "git push" or "save to git"
-Execute the git push workflow:
-1. Run: git add Tasks/ GOALS.md BACKLOG.md Knowledge/
+## "commit to git" or "git commit" or "save to git"
+Execute the git commit workflow:
+1. Run: git add Tasks/ GOALS.md Knowledge/ .kiro/ config.yaml
 2. Run: git commit -m "Update tasks - [current date]"
-3. Run: git push
-4. Confirm push successful and show commit hash
+3. Confirm commit successful and show commit hash
+4. Show recent commits
 
 ## Important
 - Always use the MCP tools (don't just read files manually)

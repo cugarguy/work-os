@@ -11,10 +11,14 @@
             "id": "b009610793782973",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "README"
             }
           }
         ]
@@ -74,8 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 343.5
   },
   "right": {
     "id": "4456a44be25c2149",
@@ -184,32 +187,35 @@
   },
   "active": "b009610793782973",
   "lastOpenFiles": [
-    "Tasks/Fix dashboard mobile Safari bug.md",
-    "Tasks/Update pricing page based on competitor changes.md",
-    "Tasks/Schedule 1-1 with Sarah on Q1 roadmap.md",
-    "Tasks/Cover AL2-AL23 migration.md",
-    "Tasks/Cover Nutanix support launch.md",
-    "Tasks/Cover THF launch.md",
-    "Tasks/Work on BI Dashboard dataset.md",
-    "Knowledge/Unified-Platform-notes.md",
-    "Tasks/Document current WBR process for assistant.md",
-    "Knowledge/WBR-current-process.md",
-    "Tasks/Document WBR writing conventions and metrics standards.md",
-    "Tasks/Gather gold standard WBR examples.md",
-    "Tasks/Gather WBR formatting guidelines.md",
-    "Tasks/Review Al2023 Documentation Updates.md",
-    "Tasks/Define Unified Platform scope and get alignment.md",
-    "Tasks/Work on BI Dashboard dataset with Renen.md",
-    "Tasks/Calculate YTD YoY and YTD growth for accounts and gateways.md",
-    "Tasks/Create YTD YoY metrics for all services.md",
-    "Tasks/Adjust weekly spreadsheet - remove attributed revenue.md",
-    "Tasks/Calculate ARR for weekly WBR.md",
-    "BACKLOG.md",
-    "Untitled.md",
-    "Untitled 1.md",
+    "backups/tasks-2025-11-12-21-27/Work on BI Dashboard dataset.md",
+    "backups/tasks-2025-11-12-21-27/Review Al2023 Documentation Updates.md",
+    "backups/tasks-2025-11-12-21-27/Document WBR process for WBR Assistant.md",
+    "backups/tasks-2025-11-12-21-27/Define Unified Platform scope and get alignment.md",
+    "backups/tasks-2025-11-12-21-27/Cover THF launch.md",
+    "backups/tasks-2025-11-12-21-27/Cover Nutanix support launch.md",
+    "backups/tasks-2025-11-12-21-27/Cover AL2-AL23 migration.md",
+    "backups/tasks-2025-11-12-21-27/Complete weekly WBR.md",
+    "backups/tasks-2025-11-12-21-27",
+    "backups",
+    "Tasks/Complete weekly WBR.md",
+    "config.yaml",
     "GOALS.md",
-    "Knowledge/Transfer Chats to new Chats Prompt.md",
-    "Knowledge/Brainstorm AI agent use cases Prompt.md",
+    "CLAUDE.md",
+    "core/README.md",
+    "core/templates/CLAUDE.md",
+    "examples/BACKLOG_example.md",
+    "examples/example_knowledge.md",
+    "examples/example_task.md",
+    "examples/sample_task.md",
+    "Tasks/Document WBR process for WBR Assistant.md",
+    "Tasks/Gather WBR formatting guidelines.md",
+    "Tasks/Gather gold standard WBR examples.md",
+    "Tasks/Define Unified Platform scope and get alignment.md",
+    "Tasks/Review Al2023 Documentation Updates.md",
+    "Tasks/Cover Nutanix support launch.md",
+    "Tasks/Cover AL2-AL23 migration.md",
+    "BACKLOG.md",
+    "Tasks/Fix dashboard mobile Safari bug.md",
     "Untitled.base"
   ]
 }
