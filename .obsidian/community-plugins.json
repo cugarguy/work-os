@@ -1,4 +1,10 @@
 [
   "obsidian-kanban",
-  "obsidian-importer"
+  "obsidian-importer",
+  "obsidian-git",
+  "editing-toolbar",
+  "omnisearch",
+  "obsidian-outliner",
+  "obsidian-mind-map",
+  "highlightr-plugin"
 ]

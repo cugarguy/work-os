@@ -194,7 +194,136 @@ def guess_category(item: str) -> str:
     else:
         return 'other'
 
-def generate_task_content(item: str, category: str) -> str:
+def classify_backlog_content(content: str) -> dict:
+    """Classify backlog content into different types"""
+    sections = content.split('---')
+    
+    result = {
+        'notes': [],
+        'tasks': [],
+        'reminders': [],
+        'meeting_notes': [],
+        'ideas': [],
+        'other': []
+    }
+    
+    for section in sections:
+        section = section.strip()
+        if not section or section == 'all done!':
+            continue
+            
+        # Identify section type based on content patterns
+        section_lower = section.lower()
+        
+        if any(keyword in section_lower for keyword in ['notes for', 'notes about', 'notes on']):
+            result['notes'].append({
+                'content': section,
+                'suggested_location': 'Knowledge/',
+                'type': 'reference_notes'
+            })
+        elif any(keyword in section_lower for keyword in ['review', 'meeting', 'discussion', 'we ', 'they ']):
+            result['meeting_notes'].append({
+                'content': section,
+                'suggested_location': 'Knowledge/',
+                'type': 'meeting_notes'
+            })
+        elif any(keyword in section_lower for keyword in ['todo', '- [ ]', 'need to', 'should ', 'must ']):
+            # Extract actual tasks
+            lines = section.split('\n')
+            for line in lines:
+                line = line.strip()
+                if line.startswith('- ') or 'need to' in line.lower() or 'should' in line.lower():
+                    result['tasks'].append({
+                        'content': line,
+                        'suggested_category': guess_category(line),
+                        'type': 'actionable_task'
+                    })
+        elif any(keyword in section_lower for keyword in ['remember', 'remind', 'follow up', 'check with']):
+            result['reminders'].append({
+                'content': section,
+                'type': 'reminder'
+            })
+        elif any(keyword in section_lower for keyword in ['idea', 'what if', 'maybe', 'could']):
+            result['ideas'].append({
+                'content': section,
+                'suggested_location': 'Knowledge/',
+                'type': 'idea'
+            })
+        else:
+            result['other'].append({
+                'content': section,
+                'type': 'unclassified'
+            })
+    
+    return result
+
+def update_session_tracker(current_task: str = None, status: str = None, notes: str = None, next_action: str = None):
+    """Update session tracking file"""
+    session_file = BASE_DIR / 'session_tracker.json'
+    
+    session_data = {
+        'last_updated': datetime.now().isoformat(),
+        'current_task': current_task,
+        'status': status,
+        'notes': notes,
+        'next_action': next_action,
+        'day': datetime.now().strftime('%Y-%m-%d'),
+        'session_active': status not in ['completed', 'ended', None]
+    }
+    
+    try:
+        with open(session_file, 'w') as f:
+            json.dump(session_data, f, indent=2)
+        return True
+    except Exception as e:
+        logger.error(f"Error updating session tracker: {e}")
+        return False
+
+def get_session_tracker() -> dict:
+    """Get current session tracking data"""
+    session_file = BASE_DIR / 'session_tracker.json'
+    
+    if not session_file.exists():
+        return {
+            'session_active': False,
+            'message': 'No previous session found'
+        }
+    
+    try:
+        with open(session_file, 'r') as f:
+            data = json.load(f)
+        
+        # Check if session is from today
+        last_day = data.get('day')
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        if last_day != today:
+            data['session_active'] = False
+            data['message'] = f'Last session was {last_day}, starting fresh for {today}'
+        
+        return data
+    except Exception as e:
+        logger.error(f"Error reading session tracker: {e}")
+        return {
+            'session_active': False,
+            'error': str(e)
+        }
+    """Suggest a filename for knowledge content"""
+    # Extract key terms from the first line or header
+    first_line = content.split('\n')[0].strip()
+    
+    # Remove common prefixes
+    for prefix in ['**Notes for', '**Notes about', '**Notes on', 'Notes for', 'Notes about']:
+        if first_line.startswith(prefix):
+            first_line = first_line.replace(prefix, '').strip('*: ')
+            break
+    
+    # Clean and format filename
+    filename = re.sub(r'[^\w\s-]', '', first_line)
+    filename = re.sub(r'[-\s]+', '-', filename)
+    filename = filename.strip('-').lower()
+    
+    return f"{filename}.md" if filename else "notes.md"
     """Generate rich task content based on item and category"""
     
     # Base structure that all tasks get
@@ -357,6 +486,171 @@ def update_file_frontmatter(filepath: Path, updates: dict) -> bool:
         logger.error(f"Error updating {filepath}: {e}")
         return False
 
+def save_time_entry(category: str, work_completed: str, time_spent: int, completion_percentage: float = None):
+    """Save time tracking entry to analytics file"""
+    analytics_file = BASE_DIR / 'time_analytics.json'
+    
+    entry = {
+        'timestamp': datetime.now().isoformat(),
+        'category': category,
+        'work_completed': work_completed,
+        'time_spent': time_spent,
+        'completion_percentage': completion_percentage
+    }
+    
+    try:
+        if analytics_file.exists():
+            with open(analytics_file, 'r') as f:
+                data = json.load(f)
+        else:
+            data = {'entries': []}
+        
+        data['entries'].append(entry)
+        
+        with open(analytics_file, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        return True
+    except Exception as e:
+        logger.error(f"Error saving time entry: {e}")
+        return False
+
+def save_distraction_entry(task_category: str, distractions: str, distraction_time: int, task_title: str = None):
+    """Save distraction tracking entry to analytics file"""
+    distractions_file = BASE_DIR / 'distraction_analytics.json'
+    
+    entry = {
+        'timestamp': datetime.now().isoformat(),
+        'task_category': task_category,
+        'task_title': task_title,
+        'distractions': distractions,
+        'distraction_time': distraction_time,
+        'day_of_week': datetime.now().strftime('%A'),
+        'hour': datetime.now().hour
+    }
+    
+    try:
+        if distractions_file.exists():
+            with open(distractions_file, 'r') as f:
+                data = json.load(f)
+        else:
+            data = {'entries': []}
+        
+        data['entries'].append(entry)
+        
+        with open(distractions_file, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        return True
+    except Exception as e:
+        logger.error(f"Error saving distraction entry: {e}")
+        return False
+
+def get_distraction_analytics(days: int = 30) -> dict:
+    """Get distraction analytics from historical data"""
+    distractions_file = BASE_DIR / 'distraction_analytics.json'
+    
+    if not distractions_file.exists():
+        return {'entries': [], 'stats': {}}
+    
+    try:
+        with open(distractions_file, 'r') as f:
+            data = json.load(f)
+        
+        entries = data.get('entries', [])
+        cutoff_date = datetime.now() - timedelta(days=days)
+        
+        # Filter by date
+        filtered_entries = []
+        for entry in entries:
+            entry_date = datetime.fromisoformat(entry['timestamp'])
+            if entry_date >= cutoff_date:
+                filtered_entries.append(entry)
+        
+        # Calculate stats
+        if filtered_entries:
+            times = [e['distraction_time'] for e in filtered_entries]
+            by_category = Counter(e['task_category'] for e in filtered_entries)
+            by_day = Counter(e['day_of_week'] for e in filtered_entries)
+            by_hour = Counter(e['hour'] for e in filtered_entries)
+            
+            # Common distraction patterns
+            distraction_types = []
+            for entry in filtered_entries:
+                distraction_types.extend([d.strip().lower() for d in entry['distractions'].split(',')])
+            common_distractions = Counter(distraction_types).most_common(5)
+            
+            stats = {
+                'total_entries': len(filtered_entries),
+                'total_distraction_time': sum(times),
+                'avg_distraction_time': sum(times) / len(times),
+                'by_task_category': dict(by_category),
+                'by_day_of_week': dict(by_day),
+                'by_hour': dict(by_hour),
+                'common_distractions': common_distractions
+            }
+        else:
+            stats = {}
+        
+        return {'entries': filtered_entries, 'stats': stats}
+    
+    except Exception as e:
+        logger.error(f"Error reading distraction analytics: {e}")
+        return {'entries': [], 'stats': {}}
+    """Get time analytics from historical data"""
+    analytics_file = BASE_DIR / 'time_analytics.json'
+    
+    if not analytics_file.exists():
+        return {'entries': [], 'stats': {}}
+    
+    try:
+        with open(analytics_file, 'r') as f:
+            data = json.load(f)
+        
+        entries = data.get('entries', [])
+        cutoff_date = datetime.now() - timedelta(days=days)
+        
+        # Filter by date and category
+        filtered_entries = []
+        for entry in entries:
+            entry_date = datetime.fromisoformat(entry['timestamp'])
+            if entry_date >= cutoff_date:
+                if not category or entry.get('category') == category:
+                    filtered_entries.append(entry)
+        
+        # Calculate stats
+        if filtered_entries:
+            times = [e['time_spent'] for e in filtered_entries]
+            by_category = {}
+            
+            for entry in filtered_entries:
+                cat = entry.get('category', 'other')
+                if cat not in by_category:
+                    by_category[cat] = []
+                by_category[cat].append(entry['time_spent'])
+            
+            stats = {
+                'total_entries': len(filtered_entries),
+                'avg_time': sum(times) / len(times),
+                'min_time': min(times),
+                'max_time': max(times),
+                'by_category': {
+                    cat: {
+                        'avg': sum(times) / len(times),
+                        'count': len(times)
+                    }
+                    for cat, times in by_category.items()
+                }
+            }
+        else:
+            stats = {}
+        
+        return {'entries': filtered_entries, 'stats': stats}
+    
+    except Exception as e:
+        logger.error(f"Error reading analytics: {e}")
+        return {'entries': [], 'stats': {}}
+
 # Create the MCP server
 app = Server("manager-ai-mcp")
 
@@ -457,6 +751,107 @@ async def handle_list_tools() -> list[types.Tool]:
                     }
                 },
                 "required": ["items"]
+            }
+        ),
+        types.Tool(
+            name="daily_checkin",
+            description="Interactive check-in for task progress tracking",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "task_updates": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "task_file": {"type": "string"},
+                                "completed": {"type": "boolean"},
+                                "worked_on": {"type": "boolean"},
+                                "work_completed": {"type": "string"},
+                                "time_spent": {"type": "integer"},
+                                "next_step": {"type": "string"},
+                                "had_distractions": {"type": "boolean"},
+                                "distractions": {"type": "string"},
+                                "distraction_time": {"type": "integer"}
+                            },
+                            "required": ["task_file"]
+                        },
+                        "description": "Array of task updates from check-in"
+                    }
+                }
+            }
+        ),
+        types.Tool(
+            name="get_time_estimates",
+            description="Get time estimates for tasks based on historical data",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "category": {"type": "string", "description": "Task category to get estimates for"},
+                    "task_description": {"type": "string", "description": "Description of new task to estimate"}
+                }
+            }
+        ),
+        types.Tool(
+            name="view_time_analytics",
+            description="View time tracking analytics and patterns",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "category": {"type": "string", "description": "Filter by category"},
+                    "days": {"type": "integer", "description": "Days of history to analyze", "default": 30}
+                }
+            }
+        ),
+        types.Tool(
+            name="view_distraction_analytics",
+            description="View distraction patterns and analytics",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "days": {"type": "integer", "description": "Days of history to analyze", "default": 30}
+                }
+            }
+        ),
+        types.Tool(
+            name="process_backlog_smart",
+            description="Intelligently process backlog into notes, tasks, reminders, and ideas",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "auto_save_notes": {"type": "boolean", "description": "Automatically save notes to Knowledge/", "default": False},
+                    "auto_create_tasks": {"type": "boolean", "description": "Automatically create identified tasks", "default": False}
+                }
+            }
+        ),
+        types.Tool(
+            name="update_session",
+            description="Update current session context and status",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "current_task": {"type": "string", "description": "Task currently being worked on"},
+                    "status": {"type": "string", "description": "Current status (working, paused, completed, blocked)"},
+                    "notes": {"type": "string", "description": "Session notes or context"},
+                    "next_action": {"type": "string", "description": "What to do next"}
+                }
+            }
+        ),
+        types.Tool(
+            name="get_session_status",
+            description="Get current session status and last context",
+            inputSchema={"type": "object", "properties": {}}
+        ),
+        types.Tool(
+            name="end_session",
+            description="End current session with summary",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "summary": {"type": "string", "description": "Session summary"},
+                    "completed_tasks": {"type": "array", "items": {"type": "string"}, "description": "Tasks completed this session"},
+                    "next_session_plan": {"type": "string", "description": "Plan for next session"}
+                }
             }
         )
     ]
@@ -846,6 +1241,379 @@ async def handle_call_tool(
             result["summary"]["recommendations"].append(
                 f"Ready to create {len(result['new_tasks'])} new tasks - use auto_create=true or create manually"
             )
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "daily_checkin":
+        task_updates = arguments.get('task_updates', [])
+        
+        if not task_updates:
+            # Return active tasks for check-in prompting
+            active_tasks = [t for t in get_all_tasks() if t.get('status') in ['s', 'n']]
+            result = {
+                "action": "prompt_for_checkin",
+                "active_tasks": [
+                    {
+                        "title": task.get('title'),
+                        "filename": task.get('filename'),
+                        "status": task.get('status'),
+                        "category": task.get('category')
+                    }
+                    for task in active_tasks
+                ],
+                "message": "Ready to start check-in process"
+            }
+        else:
+            # Process the updates
+            updated_tasks = []
+            
+            for update in task_updates:
+                task_file = update['task_file']
+                if not task_file.endswith('.md'):
+                    task_file += '.md'
+                
+                filepath = TASKS_DIR / task_file
+                if not filepath.exists():
+                    continue
+                
+                # Read current task
+                with open(filepath, 'r') as f:
+                    content = f.read()
+                metadata, body = parse_yaml_frontmatter(content)
+                
+                # Save time tracking data if work was done
+                if update.get('worked_on') and update.get('time_spent'):
+                    category = metadata.get('category', 'other')
+                    work_completed = update.get('work_completed', 'Made progress')
+                    time_spent = update.get('time_spent')
+                    
+                    # Estimate completion percentage
+                    completion_pct = 1.0 if update.get('completed') else 0.3  # Default partial completion
+                    
+                    save_time_entry(category, work_completed, time_spent, completion_pct)
+                
+                # Save distraction data if present
+                if update.get('had_distractions') and update.get('distractions'):
+                    category = metadata.get('category', 'other')
+                    task_title = metadata.get('title', '')
+                    distractions = update.get('distractions')
+                    distraction_time = update.get('distraction_time', 0)
+                    
+                    save_distraction_entry(category, distractions, distraction_time, task_title)
+                
+                # Update status if completed
+                if update.get('completed'):
+                    metadata['status'] = 'd'
+                elif update.get('worked_on') and metadata.get('status') == 'n':
+                    metadata['status'] = 's'
+                
+                # Add progress log entry
+                progress_entry = f"\n## Progress Log\n- {datetime.now().strftime('%Y-%m-%d')}: "
+                
+                if update.get('completed'):
+                    progress_entry += "Task completed"
+                elif update.get('worked_on'):
+                    work_done = update.get('work_completed', 'Made progress')
+                    time_spent = update.get('time_spent', 0)
+                    progress_entry += f"{work_done}"
+                    if time_spent:
+                        progress_entry += f" ({time_spent} min)"
+                    
+                    next_step = update.get('next_step')
+                    if next_step:
+                        progress_entry += f"\n  - Next: {next_step}"
+                
+                # Update the file
+                if "## Progress Log" not in body:
+                    body += progress_entry
+                else:
+                    # Add to existing progress log
+                    body = body.replace("## Progress Log", progress_entry.replace("## Progress Log", "## Progress Log"))
+                
+                yaml_str = yaml.dump(metadata, default_flow_style=False, sort_keys=False)
+                new_content = f"---\n{yaml_str}---\n{body}"
+                
+                with open(filepath, 'w') as f:
+                    f.write(new_content)
+                
+                updated_tasks.append({
+                    "task": metadata.get('title'),
+                    "filename": task_file,
+                    "status": metadata.get('status'),
+                    "completed": update.get('completed', False),
+                    "worked_on": update.get('worked_on', False)
+                })
+            
+            result = {
+                "action": "checkin_complete",
+                "updated_tasks": updated_tasks,
+                "message": f"Check-in complete. Updated {len(updated_tasks)} tasks."
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "get_time_estimates":
+        category = arguments.get('category')
+        task_description = arguments.get('task_description', '')
+        
+        analytics = get_time_analytics(category=category)
+        
+        if not analytics['stats']:
+            result = {
+                "estimated_time": 60,  # Default fallback
+                "confidence": "low",
+                "reason": "No historical data available",
+                "suggestion": "Start with 60 minutes and adjust based on actual time"
+            }
+        else:
+            avg_time = analytics['stats'].get('avg_time', 60)
+            count = analytics['stats'].get('total_entries', 0)
+            
+            # Adjust based on task complexity keywords
+            complexity_multiplier = 1.0
+            if any(word in task_description.lower() for word in ['complex', 'research', 'investigate', 'analyze']):
+                complexity_multiplier = 1.5
+            elif any(word in task_description.lower() for word in ['quick', 'simple', 'update', 'fix']):
+                complexity_multiplier = 0.7
+            
+            estimated_time = int(avg_time * complexity_multiplier)
+            confidence = "high" if count >= 5 else "medium" if count >= 2 else "low"
+            
+            result = {
+                "estimated_time": estimated_time,
+                "confidence": confidence,
+                "historical_avg": int(avg_time),
+                "data_points": count,
+                "category": category,
+                "complexity_adjustment": complexity_multiplier
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "view_time_analytics":
+        category = arguments.get('category')
+        days = arguments.get('days', 30)
+        
+        analytics = get_time_analytics(category=category, days=days)
+        
+        result = {
+            "period_days": days,
+            "category_filter": category,
+            "total_entries": len(analytics['entries']),
+            "stats": analytics['stats'],
+            "recent_entries": analytics['entries'][-10:] if analytics['entries'] else []
+        }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "view_distraction_analytics":
+        days = arguments.get('days', 30)
+        
+        analytics = get_distraction_analytics(days=days)
+        
+        result = {
+            "period_days": days,
+            "total_distraction_entries": len(analytics['entries']),
+            "stats": analytics['stats'],
+            "insights": [],
+            "recent_entries": analytics['entries'][-10:] if analytics['entries'] else []
+        }
+        
+        # Add insights based on patterns
+        if analytics['stats']:
+            stats = analytics['stats']
+            
+            # Time-based insights
+            if 'by_hour' in stats:
+                peak_hour = max(stats['by_hour'], key=stats['by_hour'].get)
+                result['insights'].append(f"Most distractions occur at {peak_hour}:00")
+            
+            # Day-based insights  
+            if 'by_day_of_week' in stats:
+                peak_day = max(stats['by_day_of_week'], key=stats['by_day_of_week'].get)
+                result['insights'].append(f"Most distractions happen on {peak_day}")
+            
+            # Category insights
+            if 'by_task_category' in stats:
+                worst_category = max(stats['by_task_category'], key=stats['by_task_category'].get)
+                result['insights'].append(f"Most distractions during {worst_category} tasks")
+            
+            # Common distractions
+            if 'common_distractions' in stats and stats['common_distractions']:
+                top_distraction = stats['common_distractions'][0][0]
+                result['insights'].append(f"Top distraction: {top_distraction}")
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "process_backlog_smart":
+        auto_save_notes = arguments.get('auto_save_notes', False)
+        auto_create_tasks = arguments.get('auto_create_tasks', False)
+        
+        # Read backlog
+        backlog_file = BASE_DIR / 'BACKLOG.md'
+        if not backlog_file.exists():
+            return [types.TextContent(type="text", text=json.dumps({
+                "error": "BACKLOG.md not found"
+            }, indent=2))]
+        
+        with open(backlog_file, 'r') as f:
+            content = f.read().strip()
+        
+        if not content or content == 'all done!':
+            return [types.TextContent(type="text", text=json.dumps({
+                "message": "Backlog is already clear"
+            }, indent=2))]
+        
+        # Classify content
+        classified = classify_backlog_content(content)
+        
+        result = {
+            "classification": classified,
+            "actions_taken": [],
+            "recommendations": []
+        }
+        
+        # Auto-save notes to Knowledge/
+        if auto_save_notes and (classified['notes'] or classified['meeting_notes']):
+            knowledge_dir = BASE_DIR / 'Knowledge'
+            knowledge_dir.mkdir(exist_ok=True)
+            
+            for note in classified['notes'] + classified['meeting_notes']:
+                filename = suggest_knowledge_filename(note['content'])
+                filepath = knowledge_dir / filename
+                
+                # Add timestamp and save
+                timestamped_content = f"# {filename.replace('.md', '').replace('-', ' ').title()}\n\n"
+                timestamped_content += f"*Captured: {datetime.now().strftime('%Y-%m-%d %H:%M')}*\n\n"
+                timestamped_content += note['content']
+                
+                with open(filepath, 'w') as f:
+                    f.write(timestamped_content)
+                
+                result["actions_taken"].append(f"Saved note to {filepath}")
+        
+        # Auto-create tasks
+        if auto_create_tasks and classified['tasks']:
+            for task_item in classified['tasks']:
+                task_content = task_item['content'].strip('- ')
+                category = task_item['suggested_category']
+                
+                # Create task file
+                filename = task_content.replace('/', '_').replace('\\', '_') + '.md'
+                filepath = TASKS_DIR / filename
+                
+                metadata = {
+                    'title': task_content,
+                    'category': category,
+                    'priority': 'P2',
+                    'status': 'n',
+                    'estimated_time': 30
+                }
+                
+                yaml_str = yaml.dump(metadata, default_flow_style=False, sort_keys=False)
+                file_content = f"---\n{yaml_str}---\n\n# {task_content}\n\nTask created from backlog processing."
+                
+                with open(filepath, 'w') as f:
+                    f.write(file_content)
+                
+                result["actions_taken"].append(f"Created task: {task_content}")
+        
+        # Add recommendations
+        if classified['notes'] and not auto_save_notes:
+            result["recommendations"].append(f"Found {len(classified['notes'])} note sections - consider saving to Knowledge/")
+        
+        if classified['meeting_notes'] and not auto_save_notes:
+            result["recommendations"].append(f"Found {len(classified['meeting_notes'])} meeting note sections - consider saving to Knowledge/")
+        
+        if classified['tasks'] and not auto_create_tasks:
+            result["recommendations"].append(f"Found {len(classified['tasks'])} potential tasks - consider creating them")
+        
+        if classified['reminders']:
+            result["recommendations"].append(f"Found {len(classified['reminders'])} reminders - consider scheduling or adding to calendar")
+        
+        if classified['ideas']:
+            result["recommendations"].append(f"Found {len(classified['ideas'])} ideas - consider saving to Knowledge/ideas.md")
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "update_session":
+        current_task = arguments.get('current_task')
+        status = arguments.get('status')
+        notes = arguments.get('notes')
+        next_action = arguments.get('next_action')
+        
+        success = update_session_tracker(current_task, status, notes, next_action)
+        
+        result = {
+            "success": success,
+            "updated": {
+                "current_task": current_task,
+                "status": status,
+                "notes": notes,
+                "next_action": next_action,
+                "timestamp": datetime.now().isoformat()
+            }
+        }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "get_session_status":
+        session_data = get_session_tracker()
+        
+        # Add recommendations based on session state
+        if session_data.get('session_active'):
+            session_data['recommendations'] = [
+                f"Resume working on: {session_data.get('current_task', 'Unknown task')}",
+                f"Status: {session_data.get('status', 'Unknown')}",
+                f"Next action: {session_data.get('next_action', 'Not specified')}"
+            ]
+        else:
+            session_data['recommendations'] = [
+                "No active session - ready to start fresh",
+                "Check priority tasks to begin work"
+            ]
+        
+        return [types.TextContent(type="text", text=json.dumps(session_data, indent=2))]
+    
+    elif name == "end_session":
+        summary = arguments.get('summary', '')
+        completed_tasks = arguments.get('completed_tasks', [])
+        next_session_plan = arguments.get('next_session_plan', '')
+        
+        # Update session tracker to ended state
+        update_session_tracker(
+            current_task=None,
+            status='ended',
+            notes=f"Session ended. Summary: {summary}",
+            next_action=next_session_plan
+        )
+        
+        # Save session summary to knowledge
+        session_summary = f"""# Session Summary - {datetime.now().strftime('%Y-%m-%d %H:%M')}
+
+## Summary
+{summary}
+
+## Completed Tasks
+{chr(10).join(f'- {task}' for task in completed_tasks) if completed_tasks else '- None'}
+
+## Next Session Plan
+{next_session_plan}
+"""
+        
+        knowledge_dir = BASE_DIR / 'Knowledge'
+        knowledge_dir.mkdir(exist_ok=True)
+        
+        session_file = knowledge_dir / f"session-{datetime.now().strftime('%Y-%m-%d')}.md"
+        with open(session_file, 'w') as f:
+            f.write(session_summary)
+        
+        result = {
+            "session_ended": True,
+            "summary_saved": str(session_file),
+            "completed_tasks": completed_tasks,
+            "next_session_plan": next_session_plan
+        }
         
         return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
     
