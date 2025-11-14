@@ -22,7 +22,7 @@ cd personal-os
 python3.11 -m pip install -r core/requirements.txt
 
 # Run setup script
-./setup.sh
+./scripts/setup.sh
 ```
 
 ### 2. Configure MCP Server

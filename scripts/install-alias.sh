@@ -2,8 +2,8 @@
 
 # Add PersonalOS alias to shell profile
 
-PERSONAL_OS_DIR="$(pwd)"
-ALIAS_LINE="alias pos='cd $PERSONAL_OS_DIR && ./ttgo.sh'"
+PERSONAL_OS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ALIAS_LINE="alias pos='cd $PERSONAL_OS_DIR && ./scripts/ttgo.sh'"
 
 # Detect shell and add alias
 if [[ "$SHELL" == *"zsh"* ]]; then

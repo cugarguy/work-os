@@ -20,7 +20,7 @@ print_success() {
 }
 
 # Check if session tracker exists
-SESSION_FILE="session_tracker.json"
+SESSION_FILE=".system/session_tracker.json"
 
 if [ -f "$SESSION_FILE" ]; then
     # Extract session info

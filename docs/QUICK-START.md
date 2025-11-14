@@ -4,7 +4,7 @@
 
 ```bash
 # Install global alias (optional but recommended)
-./install-alias.sh
+./scripts/install-alias.sh
 ```
 
 ## Daily Usage
@@ -16,7 +16,7 @@ pos
 
 ### Option 2: From this directory
 ```bash
-./ttgo.sh
+./scripts/ttgo.sh
 ```
 
 ## What happens when you start:

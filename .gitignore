@@ -10,11 +10,18 @@ BACKLOG.md
 CLAUDE.md       # If customized from template
 GOALS.md        # Personal goals
 
+# Daily notes
+daily-notes/*.md
+
+# People files (personal contact info)
+People/*.md
+!People/README.md
+
+# System files
+.system/session_tracker.json
+
 # Keep templates and examples
-!CLAUDE_TEMPLATE.md
-!config.example.yaml
 !Tasks/example.md
-!CRM/example.md
 
 # Python
 __pycache__/

@@ -35,7 +35,8 @@
               "title": "SCRATCH"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -202,8 +203,29 @@
       "omnisearch:Omnisearch": false
     }
   },
-  "active": "2e28627407428065",
+  "active": "616ac0dfe94dfd84",
   "lastOpenFiles": [
+    "docs/STRUCTURE_REVIEW.md",
+    "People/README.md",
+    "core/templates/person.md",
+    "People",
+    "BACKLOG.md",
+    "docs/REORGANIZATION.md",
+    "daily-notes/README.md",
+    "scripts/README.md",
+    "daily-notes/2025-11-13.md",
+    "scripts/install-alias.sh",
+    "scripts/ttgo.sh",
+    "scripts/setup.sh",
+    "docs/FILE_AUDIT_REPORT.md",
+    "docs/LICENSE",
+    "docs/CHANGELOG.md",
+    "docs/QUICK-START.md",
+    "docs/README.md",
+    "daily-notes",
+    "scripts",
+    "docs",
+    "FILE_AUDIT_REPORT.md",
     "CHANGELOG.md",
     "Tasks/Install dev builder desktop.md",
     "start.sh",
@@ -212,34 +234,13 @@
     "Knowledge/q-ai-best-practices.md",
     "Knowledge/productivity-tools.md",
     "Tasks/Add new functions to PersonalOS.md",
-    "ttgo.sh",
     "SCRATCH.md",
-    "BACKLOG.md",
     "Untitled.canvas",
     "Untitled Kanban.md",
     "QUICK-START.md",
-    "core/mcp/run-server.sh",
-    "install-alias.sh",
     "2025-11-13.md",
-    "WorkOS.base",
     "Clippings/Save Articles to Obsidian Five Different Methods.md",
-    "Clippings",
     "README.md",
-    "backups/tasks-2025-11-12-21-27/Work on BI Dashboard dataset.md",
-    "backups/tasks-2025-11-12-21-27/Review Al2023 Documentation Updates.md",
-    "backups/tasks-2025-11-12-21-27/Document WBR process for WBR Assistant.md",
-    "backups/tasks-2025-11-12-21-27/Define Unified Platform scope and get alignment.md",
-    "backups/tasks-2025-11-12-21-27/Cover THF launch.md",
-    "backups/tasks-2025-11-12-21-27/Cover Nutanix support launch.md",
-    "backups/tasks-2025-11-12-21-27/Cover AL2-AL23 migration.md",
-    "backups/tasks-2025-11-12-21-27/Complete weekly WBR.md",
-    "backups/tasks-2025-11-12-21-27",
-    "backups",
-    "Tasks/Complete weekly WBR.md",
-    "config.yaml",
-    "GOALS.md",
-    "CLAUDE.md",
-    "core/README.md",
-    "core/templates/CLAUDE.md"
+    "backups/tasks-2025-11-12-21-27/Work on BI Dashboard dataset.md"
   ]
 }

@@ -259,7 +259,7 @@ def classify_backlog_content(content: str) -> dict:
 
 def update_session_tracker(current_task: str = None, status: str = None, notes: str = None, next_action: str = None):
     """Update session tracking file"""
-    session_file = BASE_DIR / 'session_tracker.json'
+    session_file = BASE_DIR / '.system' / 'session_tracker.json'
     
     session_data = {
         'last_updated': datetime.now().isoformat(),
@@ -281,7 +281,7 @@ def update_session_tracker(current_task: str = None, status: str = None, notes: 
 
 def get_session_tracker() -> dict:
     """Get current session tracking data"""
-    session_file = BASE_DIR / 'session_tracker.json'
+    session_file = BASE_DIR / '.system' / 'session_tracker.json'
     
     if not session_file.exists():
         return {

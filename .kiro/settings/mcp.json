@@ -27,6 +27,16 @@
         "get_session_status",
         "end_session"
       ]
+    },
+    "builder-mcp": {
+      "command": "builder-mcp",
+      "disabled": false,
+      "env": {},
+      "autoApprove": [
+        "ReadInternalWebsites",
+        "InternalSearch",
+        "BrazilBuildAnalyzerTool"
+      ]
     }
   }
 }

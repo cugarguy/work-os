@@ -12,7 +12,7 @@ Track all updates, enhancements, and changes to the PersonalOS system.
 - **Session Tracking**: Maintain context across Q restarts with day continuity
 - **Time Estimates**: AI-powered estimates based on historical data and task categories
 - **Priority Limit Monitoring**: Alerts when P0/P1 tasks exceed recommended limits
-- **Task Aging**: Automatic cleanup of old completed tasks
+- **People Tracker**: Contact and relationship management with meeting notes and context
 
 ### Tools Enhanced/Added
 - `daily_checkin` - Interactive task progress tracking with distraction logging
