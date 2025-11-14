@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "name": "PersonalOS Mark Task Done",
+  "name": "WorkOS Mark Task Done",
   "description": "Mark a task as complete",
   "version": "1",
   "when": {

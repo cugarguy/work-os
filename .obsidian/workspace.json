@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "SCRATCH.md",
-                "mode": "source",
+                "file": "FOLDER_RENAME_CHECKLIST.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "SCRATCH"
+              "title": "FOLDER_RENAME_CHECKLIST"
             }
           }
         ],
@@ -93,8 +93,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
     "id": "4456a44be25c2149",
@@ -196,15 +195,14 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "bases:Create new base": false,
-      "obsidian-kanban:Create new board": false,
-      "obsidian-importer:Open Importer": false,
-      "obsidian-git:Open Git source control": false,
-      "omnisearch:Omnisearch": false
+      "bases:Create new base": false
     }
   },
   "active": "616ac0dfe94dfd84",
   "lastOpenFiles": [
+    "SCRATCH.md",
+    "FOLDER_RENAME_CHECKLIST.md",
+    "docs/RENAME_SUMMARY.md",
     "docs/STRUCTURE_REVIEW.md",
     "People/README.md",
     "core/templates/person.md",
@@ -234,13 +232,10 @@
     "Knowledge/q-ai-best-practices.md",
     "Knowledge/productivity-tools.md",
     "Tasks/Add new functions to PersonalOS.md",
-    "SCRATCH.md",
     "Untitled.canvas",
     "Untitled Kanban.md",
     "QUICK-START.md",
     "2025-11-13.md",
-    "Clippings/Save Articles to Obsidian Five Different Methods.md",
-    "README.md",
-    "backups/tasks-2025-11-12-21-27/Work on BI Dashboard dataset.md"
+    "Clippings/Save Articles to Obsidian Five Different Methods.md"
   ]
 }

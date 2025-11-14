@@ -2,9 +2,9 @@
 inclusion: always
 ---
 
-# PersonalOS Task Management Instructions
+# WorkOS Task Management Instructions
 
-You are helping manage tasks using the PersonalOS system. This workspace uses a goal-driven task management approach.
+You are helping manage tasks using the WorkOS system. This workspace uses a goal-driven task management approach.
 
 ## System Overview
 

@@ -1,15 +1,17 @@
 {
   "mcpServers": {
-    "personalos": {
+    "workos": {
       "command": "python3.11",
-      "args": ["/Users/bsteeger/Documents/1-projects/workOS/personal-os/core/mcp/server.py"],
-      "disabled": false,
+      "args": [
+        "/Users/bsteeger/Documents/1-projects/workOS/work-os/core/mcp/server.py"
+      ],
       "env": {
-        "MANAGER_AI_BASE_DIR": "/Users/bsteeger/Documents/1-projects/workOS/personal-os"
+        "MANAGER_AI_BASE_DIR": "/Users/bsteeger/Documents/1-projects/workOS/work-os"
       },
+      "disabled": false,
       "autoApprove": [
         "list_tasks",
-        "get_task_summary", 
+        "get_task_summary",
         "process_backlog",
         "process_backlog_with_dedup",
         "process_backlog_smart",
@@ -30,8 +32,8 @@
     },
     "builder-mcp": {
       "command": "builder-mcp",
-      "disabled": false,
       "env": {},
+      "disabled": true,
       "autoApprove": [
         "ReadInternalWebsites",
         "InternalSearch",

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# PersonalOS Q Chat Launcher with Session Resume
+# WorkOS Q Chat Launcher with Session Resume
 # Maintains conversation context across restarts
 
 set -e

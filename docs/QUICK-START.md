@@ -1,4 +1,4 @@
-# PersonalOS Quick Start
+# WorkOS Quick Start
 
 ## One-Time Setup
 

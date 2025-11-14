@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "name": "PersonalOS Backlog Processor",
+  "name": "WorkOS Backlog Processor",
   "description": "Triggers when BACKLOG.md is saved to process tasks using instructions from CLAUDE.md with context from goals, tasks, and knowledge base",
   "version": "1",
   "when": {

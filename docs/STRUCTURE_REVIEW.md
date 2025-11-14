@@ -1,4 +1,4 @@
-# PersonalOS Structure Review
+# WorkOS Structure Review
 *Review Date: November 14, 2025*
 
 ## Current Structure Status
@@ -8,7 +8,7 @@
 The directory reorganization completed earlier is still in place:
 
 ```
-personal-os/
+work-os/
 ├── docs/                    # Documentation ✅
 │   ├── README.md
 │   ├── QUICK-START.md
@@ -51,7 +51,7 @@ personal-os/
 │   ├── settings/
 │   │   └── mcp.json       # Now includes builder-mcp
 │   ├── steering/
-│   │   ├── personalos-instructions.md
+│   │   ├── workos-instructions.md
 │   │   ├── chat-commands.md
 │   │   └── task-context.md
 │   └── hooks/             # 8 hook files
@@ -105,7 +105,7 @@ personal-os/
 ## MCP Configuration Updates
 
 ### Current MCP Servers
-1. **personalos** ✅
+1. **workos** ✅
    - Command: `python3.11`
    - Path: Local MCP server
    - Status: Active

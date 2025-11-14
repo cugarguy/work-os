@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "name": "PersonalOS Show Priorities",
+  "name": "WorkOS Show Priorities",
   "description": "Quick view of P0 and P1 tasks",
   "version": "1",
   "when": {

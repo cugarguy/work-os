@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "name": "PersonalOS Git Commit",
+  "name": "WorkOS Git Commit",
   "description": "Commit Tasks to local git",
   "version": "1",
   "when": {

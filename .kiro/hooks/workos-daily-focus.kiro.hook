@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "name": "PersonalOS Daily Focus",
+  "name": "WorkOS Daily Focus",
   "description": "Suggests what to work on today based on priorities and goals",
   "version": "1",
   "when": {

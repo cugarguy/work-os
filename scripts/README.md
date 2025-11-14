@@ -1,6 +1,6 @@
 # Scripts Directory
 
-Setup and utility scripts for PersonalOS.
+Setup and utility scripts for WorkOS.
 
 ## Scripts
 
@@ -21,4 +21,4 @@ Setup and utility scripts for PersonalOS.
 ./scripts/install-alias.sh
 ```
 
-After installing the alias, you can simply type `pos` from anywhere to start PersonalOS.
+After installing the alias, you can simply type `pos` from anywhere to start WorkOS.

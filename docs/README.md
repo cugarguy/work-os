@@ -1,4 +1,4 @@
-# PersonalOS
+# WorkOS
 
 Your AI-powered task management system that keeps you focused on what matters.
 
@@ -8,8 +8,8 @@ Brain dump into `BACKLOG.md`, tell your AI assistant to process it, and get orga
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/amanaiproduct/personal-os.git
-cd personal-os
+git clone https://github.com/amanaiproduct/work-os.git
+cd work-os
 ```
 
 ### 2. Run Setup (2 minutes)
@@ -55,7 +55,7 @@ The setup will:
 ## 📂 Directory Structure
 
 ```
-personal-os/
+work-os/
 ├── core/                    # Reusable system components (public)
 │   ├── mcp/                # MCP server implementation
 │   │   └── server.py       # Core server with deduplication
@@ -70,7 +70,7 @@ personal-os/
 ├── BACKLOG.md             # Your backlog inbox (gitignored)
 ├── scripts/               # Setup and utility scripts
 │   ├── setup.sh          # Interactive setup script
-│   ├── ttgo.sh           # PersonalOS startup script
+│   ├── ttgo.sh           # WorkOS startup script
 │   └── install-alias.sh  # Shell alias installer
 ├── docs/                 # Documentation
 │   ├── README.md         # This file

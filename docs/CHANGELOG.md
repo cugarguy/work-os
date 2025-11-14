@@ -1,8 +1,13 @@
-# PersonalOS Changelog
+# WorkOS Changelog
 
-Track all updates, enhancements, and changes to the PersonalOS system.
+Track all updates, enhancements, and changes to the WorkOS system.
 
 ## 2025-11-14 - Major Enhancement Session
+
+### Project Rename & Restructure
+- **Renamed**: PersonalOS → WorkOS (better reflects professional focus)
+- **Directory Migration**: Moved from `personalOS/` parent folder to `WorkOS/`
+- **Updated References**: All documentation, scripts, and configuration files updated to reflect new name
 
 ### New Features Added
 - **Daily Check-ins**: Interactive progress tracking with time/distraction logging
@@ -44,7 +49,7 @@ Track all updates, enhancements, and changes to the PersonalOS system.
 - **Workflow Optimization**: Streamlined backlog-to-task conversion process
 
 ### Bug Fixes
-- **MCP Loading**: Resolved "personal-os failed to load" errors
+- **MCP Loading**: Resolved "work-os failed to load" errors
 - **Python Dependencies**: Fixed YAML and MCP package installation issues
 - **Tool Registration**: Ensured all new tools are properly registered and accessible
 - **File Path Issues**: Corrected relative vs absolute path handling

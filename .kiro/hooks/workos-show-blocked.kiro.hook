@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "name": "PersonalOS Show Blocked Tasks",
+  "name": "WorkOS Show Blocked Tasks",
   "description": "Show tasks that are blocked and need attention",
   "version": "1",
   "when": {

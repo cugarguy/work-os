@@ -2,7 +2,7 @@
 inclusion: always
 ---
 
-# PersonalOS Chat Commands
+# WorkOS Chat Commands
 
 When the user says certain phrases in chat, execute the corresponding workflow:
 

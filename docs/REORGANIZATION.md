@@ -1,4 +1,4 @@
-# PersonalOS Directory Reorganization
+# WorkOS Directory Reorganization
 
 *Completed: November 14, 2025*
 
@@ -9,7 +9,7 @@ Reorganized root directory to reduce clutter and improve maintainability while k
 ## New Structure
 
 ```
-personal-os/
+work-os/
 ├── docs/                    # Documentation (moved)
 │   ├── README.md
 │   ├── QUICK-START.md

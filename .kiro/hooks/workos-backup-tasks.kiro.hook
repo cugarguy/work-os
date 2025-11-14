@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "name": "PersonalOS Backup Tasks",
+  "name": "WorkOS Backup Tasks",
   "description": "Backup tasks to a timestamped folder",
   "version": "1",
   "when": {

@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "name": "PersonalOS Weekly Review",
+  "name": "WorkOS Weekly Review",
   "description": "Review completed work and clean up old tasks",
   "version": "1",
   "when": {
