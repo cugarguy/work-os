@@ -50,6 +50,69 @@ Every task should have:
 - Next Actions checklist
 - Progress Log with dates
 
+### Complete Task Structure
+
+```yaml
+---
+title: [Actionable task name]
+category: [technical|outreach|research|writing|admin|personal|other]
+priority: [P0|P1|P2|P3]
+status: n  # n=not_started, s=started, b=blocked, d=done
+created_date: [YYYY-MM-DD]
+due_date: [YYYY-MM-DD]  # optional
+estimated_time: [minutes]  # optional
+resource_refs:
+  - Knowledge/example.md
+  - People/John Smith.md
+---
+
+# [Task name]
+
+## Context
+Tie to goals from GOALS.md. Reference specific goal sections or quotes.
+Link to relevant Knowledge/ files or People/ files for background.
+
+## Next Actions
+- [ ] First specific action
+- [ ] Second specific action
+- [ ] Third specific action
+
+## Progress Log
+- YYYY-MM-DD: Initial notes, decisions, or context
+- YYYY-MM-DD: Updates, blockers, or progress
+```
+
+## Goals Alignment
+
+- **Always tie tasks to goals** - Every task Context section must reference GOALS.md
+- **Be specific** - Quote goal sections or use specific headings from GOALS.md
+- **Question goalless tasks** - If a task doesn't support any goal, ask why it should be done
+- **Update as goals evolve** - When GOALS.md changes, review task alignment
+
+## Deduplication Features
+
+The system automatically:
+- **Detects similar tasks** using fuzzy matching (60% similarity threshold)
+- **Identifies ambiguous items** that need clarification
+- **Suggests appropriate categories** based on keywords
+- **Prevents duplicate creation** by flagging potential matches
+
+When processing backlog:
+1. Check for duplicates first with `process_backlog_with_dedup`
+2. Ask clarifying questions for ambiguous items
+3. Suggest category based on keywords
+4. Create tasks only after confirming no duplicates
+
+## Best Practices for Backlog Processing
+
+1. **Process ONE item at a time** - Don't batch create without user confirmation
+2. **Ask minimal questions** - Only what's needed to resolve ambiguity
+3. **Suggest defaults** - Offer category/priority suggestions based on content
+4. **Check duplicates first** - Always use deduplication before creating
+5. **Tie to goals immediately** - Write Context section referencing GOALS.md
+6. **Estimate time** - Provide realistic time estimates in minutes
+7. **Link resources** - Add relevant Knowledge/ or People/ files to resource_refs
+
 ## Interaction Style
 
 - Be direct, friendly, and concise
