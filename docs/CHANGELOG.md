@@ -2,6 +2,35 @@
 
 Track all updates, enhancements, and changes to the WorkOS system.
 
+## 2025-11-17 - Daily & Weekly Closeout Workflows
+
+### New Features Added
+- **Daily Closeout Workflow**: End-of-day review capturing completed tasks, time spent, distractions, and reflections
+- **Weekly Closeout Workflow**: End-of-week summary with goal progress, accomplishments, and next week planning
+- **Morning Startup Check**: Automatic detection of missing closeouts with prompts to complete them before starting new work
+- **Enhanced Session Tracker**: Now tracks last daily/weekly closeout dates and current week start
+
+### New Steering Files
+- `closeout-workflows.md` - Complete documentation of daily/weekly closeout processes
+- `knowledge-context.md` - Guidelines for Knowledge/ directory usage
+- `daily-notes-context.md` - Guidelines for daily-notes/ directory usage
+- `people-context.md` - Guidelines for People/ directory usage
+- `git-workflow.md` - Git commit workflow documentation
+
+### Enhanced Files
+- `chat-commands.md` - Added closeout and morning startup commands
+- `workos-instructions.md` - Added complete task template, goals alignment, deduplication details
+- `.system/session_tracker.json` - Added closeout tracking fields
+- `.system/README.md` - Documented session tracker fields
+
+### Workflow Improvements
+- Morning routine now checks for missing closeouts before starting work
+- Daily closeouts create structured summaries in daily-notes/
+- Weekly closeouts assess goal progress and plan next week
+- Closeout data feeds into time estimates and productivity insights
+
+---
+
 ## 2025-11-14 - Major Enhancement Session
 
 ### Project Rename & Restructure
