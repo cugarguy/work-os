@@ -78,46 +78,52 @@ Execute the git commit workflow:
 
 ## "close out today" or "end of day" or "daily closeout"
 Execute the daily closeout workflow:
-1. Use list_tasks with include_done=true
-2. Identify tasks completed today (check Progress Log for today's date)
-3. Identify tasks in progress (status='s')
-4. Ask about: productive time, distractions, blockers, reflections
-5. Create summary in daily-notes/YYYY-MM-DD.md with:
+1. **Get current date first**: Run `date +"%Y-%m-%d"`
+2. Use list_tasks with include_done=true
+3. Identify tasks completed today (check Progress Log for today's date)
+4. Identify tasks in progress (status='s')
+5. Ask about: productive time, distractions, blockers, reflections
+6. Create summary in daily-notes/YYYY-MM-DD.md with:
    - Completed tasks with time spent
    - In progress tasks
    - Time summary (productive, distractions, unplanned)
    - Reflections (what went well, what didn't, blockers)
    - Tomorrow's top 3 priorities
-6. Update session tracker with closeout completion
-7. Suggest tomorrow's focus based on P0/P1 tasks
+7. Update session tracker: set last_daily_closeout to today's date
+8. Suggest tomorrow's focus based on P0/P1 tasks
 
 ## "close out this week" or "weekly closeout" or "end of week"
 Execute the weekly closeout workflow:
-1. Use list_tasks with include_done=true
-2. Identify tasks completed this week (check Progress Log)
-3. Group by priority and link to goals
-4. Ask about: total time, major accomplishments, distractions, goal progress
-5. Create summary in daily-notes/weekly-closeout-YYYY-MM-DD.md with:
+1. **Get current date first**: Run `date +"%Y-%m-%d"` and calculate week dates
+2. Calculate this Monday: `date -v-Mon +"%Y-%m-%d"`
+3. Use list_tasks with include_done=true
+4. Identify tasks completed this week (check Progress Log for dates >= this Monday)
+5. Group by priority and link to goals
+6. Ask about: total time, major accomplishments, distractions, goal progress
+7. Create summary in daily-notes/weekly-closeout-YYYY-MM-DD.md with:
    - Completed tasks by priority with goal alignment
    - In progress tasks with blockers
    - Time summary and patterns
    - Goal progress assessment
    - Reflections and wins
    - Next week's priorities
-6. Use check_priority_limits to assess workload
-7. Optionally use prune_completed_tasks
-8. Update session tracker with weekly closeout completion
-9. Suggest next week's focus
+8. Use check_priority_limits to assess workload
+9. Optionally use prune_completed_tasks
+10. Update session tracker: set last_weekly_closeout to today's date
+11. Suggest next week's focus
 
 ## "start my day" or "good morning" or "begin work"
 Execute the morning startup workflow:
-1. Check session tracker for last_daily_closeout
-2. If yesterday not closed out → Run daily closeout for yesterday FIRST
-3. If Monday, check last_weekly_closeout
-4. If previous week not closed out → Run weekly closeout FIRST
-5. Then show today's priorities (P0/P1 tasks)
-6. Suggest 1-3 focus tasks for today
-7. Update session tracker with current day
+1. **Get current date first**: Run `date +"%Y-%m-%d"` and `date +"%A"`
+2. Read session tracker for last_daily_closeout
+3. Calculate yesterday's date: `date -v-1d +"%Y-%m-%d"`
+4. If yesterday not closed out → Run daily closeout for yesterday FIRST
+5. If today is Monday, check last_weekly_closeout
+6. Calculate last Friday: `date -v-Fri -v-7d +"%Y-%m-%d"`
+7. If previous week not closed out → Run weekly closeout FIRST
+8. Then show today's priorities (P0/P1 tasks)
+9. Suggest 1-3 focus tasks for today
+10. Update session tracker with current day and week start
 
 ## Important
 - Always use the MCP tools (don't just read files manually)
