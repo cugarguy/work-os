@@ -1,5 +1,11 @@
 # PersonalOS Configuration
 
+# Hooks
+hooks:
+  - name: check_closeouts
+    event: AgentSpawn
+    command: .kiro/hooks/check_closeouts.sh
+
 # Task categories
 categories:
   - technical      # Build, fix, configure

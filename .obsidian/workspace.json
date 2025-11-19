@@ -4,39 +4,20 @@
     "type": "split",
     "children": [
       {
-        "id": "7b1b0108e960269a",
+        "id": "e4f83a673922c5c8",
         "type": "tabs",
         "children": [
           {
-            "id": "2e28627407428065",
+            "id": "8bce63e0d1d276af",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "BACKLOG.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "BACKLOG"
-            }
-          },
-          {
-            "id": "616ac0dfe94dfd84",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "FOLDER_RENAME_CHECKLIST.md",
-                "mode": "preview",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "FOLDER_RENAME_CHECKLIST"
+              "title": "New tab"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -195,19 +176,36 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "bases:Create new base": false
+      "bases:Create new base": false,
+      "obsidian-kanban:Create new board": false,
+      "obsidian-importer:Open Importer": false,
+      "obsidian-git:Open Git source control": false,
+      "omnisearch:Omnisearch": false
     }
   },
-  "active": "616ac0dfe94dfd84",
+  "active": "8bce63e0d1d276af",
   "lastOpenFiles": [
-    "SCRATCH.md",
+    "BACKLOG.md",
     "FOLDER_RENAME_CHECKLIST.md",
+    "People/Smitha.md",
+    "Tasks/Answer Jeff's questions about S3 FGW.md",
+    "Knowledge/TGW.md",
+    "Tasks/Conduct more data analysis.md",
+    "Tasks/Research on-prem vs in cloud.md",
+    "CAPTURE.md",
+    "Tasks/Edit Al2023 documentation.md",
+    "Tasks/Research IC vs OP data connection.md",
+    "daily-notes/2025-11-17.md",
+    "Tasks/Setup desktop for doc writing access.md",
+    "Knowledge/Weekly-Closeout-2025-11-15.md",
+    "Tasks/Weekly Closeout Process.md",
+    "Tasks/Daily Closeout Process.md",
+    "SCRATCH.md",
     "docs/RENAME_SUMMARY.md",
     "docs/STRUCTURE_REVIEW.md",
     "People/README.md",
     "core/templates/person.md",
     "People",
-    "BACKLOG.md",
     "docs/REORGANIZATION.md",
     "daily-notes/README.md",
     "scripts/README.md",
@@ -218,24 +216,11 @@
     "docs/FILE_AUDIT_REPORT.md",
     "docs/LICENSE",
     "docs/CHANGELOG.md",
-    "docs/QUICK-START.md",
-    "docs/README.md",
     "daily-notes",
     "scripts",
     "docs",
-    "FILE_AUDIT_REPORT.md",
-    "CHANGELOG.md",
-    "Tasks/Install dev builder desktop.md",
     "start.sh",
     "session_tracker.json",
-    "Knowledge/wbr-review-2025-11-14.md",
-    "Knowledge/q-ai-best-practices.md",
-    "Knowledge/productivity-tools.md",
-    "Tasks/Add new functions to PersonalOS.md",
-    "Untitled.canvas",
-    "Untitled Kanban.md",
-    "QUICK-START.md",
-    "2025-11-13.md",
-    "Clippings/Save Articles to Obsidian Five Different Methods.md"
+    "Untitled.canvas"
   ]
 }

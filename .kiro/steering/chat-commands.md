@@ -16,6 +16,19 @@ Execute the backlog processing workflow:
 6. Create tasks with full Context sections tied to GOALS.md
 7. Clear backlog when done
 
+## "process capture" or "triage capture" or "clear capture"
+Execute the capture processing workflow:
+1. Read #CAPTURE.md, #GOALS.md, #Tasks/, #Knowledge/
+2. Extract items from capture file
+3. For each item, ask: Task, Knowledge, Goal update, Skip, or Delete?
+4. If Task: use process_backlog_with_dedup, create with full Context
+5. If Knowledge: ask for filename, save to Knowledge/
+6. If Goal: ask which section to update in GOALS.md
+7. If Skip: leave in CAPTURE.md, move to next
+8. If Delete: remove from CAPTURE.md
+9. Process ONE AT A TIME interactively
+10. Only remove processed items (not skipped ones)
+
 ## "what should I work on" or "daily focus" or "review my day"
 Execute the daily focus workflow:
 1. Read #GOALS.md and #Tasks/
@@ -47,6 +60,20 @@ Execute the weekly review workflow:
 4. Use check_priority_limits to check if overloaded
 5. Ask about pruning old completed tasks (use prune_completed_tasks)
 6. Suggest goals needing attention
+
+## "review backlog" or "prioritize tasks" or "review priorities"
+Execute the task prioritization workflow:
+1. Read #GOALS.md to understand current objectives and deadlines
+2. Use list_tasks to get all active tasks (not done)
+3. Group tasks by current priority (P0, P1, P2, P3)
+4. For each task, review ONE AT A TIME:
+   - Does it still align with current goals?
+   - Is the priority still correct given deadlines?
+   - Should it move up (more urgent) or down (less urgent)?
+   - Consider work_type for scheduling feasibility
+5. Ask user to confirm priority changes
+6. Update task priorities as needed
+7. Summarize final priority distribution
 
 ## "show blocked tasks" or "what's blocked"
 Execute the blocked tasks workflow:
@@ -125,8 +152,51 @@ Execute the morning startup workflow:
 9. Suggest 1-3 focus tasks for today
 10. Update session tracker with current day and week start
 
+## "add person" or "create person file"
+Execute the add person workflow:
+1. Ask for person's name
+2. Ask for role/title and team/organization
+3. Ask about relationship context (how you know them, working relationship)
+4. Ask about key projects/topics you work on together
+5. Create person file from template in People/[Name].md
+6. Use Obsidian [[links]] format for cross-references
+7. Confirm file created
+
+## "update person notes" or "add notes for [person]"
+Execute the person notes workflow:
+1. If person name provided, find their file; otherwise ask for name
+2. If person file doesn't exist, offer to create it
+3. Ask for note type: meeting, conversation, email, or general
+4. Ask for key discussion points
+5. Ask for action items (if any)
+6. Add dated entry to person's file
+7. Auto-link any mentioned tasks using [[Task Name]] format
+8. Auto-link any mentioned knowledge docs using [[Doc Name]] format
+9. Update person file's "Last Updated" date
+10. Confirm notes added
+
+## "link person to task" or "connect [person] to [task]"
+Execute the bidirectional linking workflow:
+1. If person/task not specified, ask for both
+2. Verify person file exists (create if needed)
+3. Verify task file exists
+4. Add person to task's resource_refs: People/[Name].md
+5. Add task to person's "Related Tasks/Projects" section using [[Task Name]]
+6. Confirm bidirectional link created
+
+## "update other people" or "review other people"
+Execute the Other People file update workflow:
+1. Read People/Other People.md
+2. Check if any person has been mentioned 3+ times across files
+3. If yes, suggest promoting them to their own person file
+4. Create dedicated file with context from Other People.md
+5. Remove from Other People.md
+6. Update any references to point to new file
+
 ## Important
 - Always use the MCP tools (don't just read files manually)
 - Keep responses concise and actionable
 - Tie everything back to GOALS.md
 - Check for missing closeouts every morning before starting work
+- Use Obsidian [[links]] format for all cross-references
+- Auto-link people when mentioned in tasks or notes

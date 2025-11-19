@@ -48,28 +48,36 @@ Draft the SQG strategy, deliver high quality WBRs, build my AI skills so that th
 
 When evaluating new tasks and commitments:
 
-**P0 (Critical/Urgent)** - Must do THIS WEEK:
-- Directly advances quarterly objectives
+**P0 (Active)** - Working on it now:
+- Currently in progress
+- Has my active attention
+- Blocking other work until complete
 - Time-sensitive opportunities
 - Critical stakeholder communication
 - Immediate blockers to remove
 
-**P1 (Important)** - This month:
-- Builds key skills or expertise
+**P1 (Next Up)** - Queued to work on next:
+- Ready to start when P0 completes
+- Important and time-sensitive
+- Directly advances quarterly objectives
+- Critical stakeholder needs
 - Advances product strategy
 - Significant career development
 - High-value learning opportunities
+- Builds skills crucial to current goals
 
-**P2 (Normal)** - Scheduled work:
-- Supports broader objectives
+**P2 (Scheduled/Operational)** - Recurring and operational work:
+- Regular meetings and reviews (WBRs, 1:1s)
+- Ongoing operational responsibilities
 - Maintains stakeholder relationships
-- Operational efficiency
-- General learning and exploration
-
-**P3 (Low)** - Nice to have:
+- Maintenance and support tasks
+- Scheduled commitments
 - Administrative tasks
-- Speculative projects
-- Activities without clear advancement value
+
+**P3 (Downtime)** - When I have time:
+- General learning and exploration
+- Skill development for future use
+- Nice-to-have improvements
 
 ## What are your top 3 priorities right now?
 

@@ -37,6 +37,10 @@ else
     print_info "No previous session - starting fresh"
 fi
 
-# Launch Q with resume flag to maintain context
-print_info "Launching Q Chat with session continuity..."
-exec q chat --resume
+# Check for missing closeouts
+print_info "Checking closeout status..."
+bash .kiro/hooks/check_closeouts.sh
+
+# Launch Kiro CLI with conversation resume and intelligent startup
+print_info "Launching Kiro Chat with session continuity..."
+exec kiro-cli chat --resume "Check session history, review closeout status, check current date/time, assess how much time has passed since our last interaction, then greet me and suggest what we should work on based on context."

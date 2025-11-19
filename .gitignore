@@ -5,6 +5,7 @@
 Tasks/*.md
 !Tasks/.gitkeep
 BACKLOG.md
+CAPTURE.md
 
 # Personal configuration
 CLAUDE.md       # If customized from template

@@ -26,10 +26,10 @@ You are helping manage tasks using the WorkOS system. This workspace uses a goal
 
 ## Priority Framework
 
-- **P0 (Critical/Urgent)**: Must do THIS WEEK - directly advances quarterly objectives
-- **P1 (Important)**: This month - builds key skills or advances product strategy
-- **P2 (Normal)**: Scheduled work - supports broader objectives
-- **P3 (Low)**: Nice to have - administrative tasks, speculative projects
+- **P0 (Active)**: Working on it now - currently in progress, has active attention, blocking other work, time-sensitive opportunities, critical stakeholder communication, immediate blockers
+- **P1 (Next Up)**: Queued to work on next - ready to start when P0 completes, important and time-sensitive, advances quarterly objectives, critical stakeholder needs, advances product strategy, significant career development, high-value learning opportunities, builds skills crucial to current goals
+- **P2 (Scheduled/Operational)**: Recurring and operational work - meetings, reviews, ongoing responsibilities, maintains stakeholder relationships, maintenance and support tasks, scheduled commitments, administrative tasks
+- **P3 (Downtime)**: When I have time - general learning and exploration, skill development for future use, nice-to-have improvements
 
 ## Task Categories
 
@@ -57,7 +57,8 @@ Every task should have:
 title: [Actionable task name]
 category: [technical|outreach|research|writing|admin|personal|other]
 priority: [P0|P1|P2|P3]
-status: n  # n=not_started, s=started, b=blocked, d=done
+status: n  # n=not_started, s=started, b=blocked, d=done, p=pending, q=question
+work_type: [deep|review|reactive|iterative|collaborative|research|admin]  # optional
 created_date: [YYYY-MM-DD]
 due_date: [YYYY-MM-DD]  # optional
 estimated_time: [minutes]  # optional
@@ -72,6 +73,10 @@ resource_refs:
 Tie to goals from GOALS.md. Reference specific goal sections or quotes.
 Link to relevant Knowledge/ files or People/ files for background.
 
+**Related to:** [Larger initiative or project]
+**Dependencies:** [What this depends on or blocks]
+**Why now:** [Timing rationale]
+
 ## Next Actions
 - [ ] First specific action
 - [ ] Second specific action
@@ -81,6 +86,15 @@ Link to relevant Knowledge/ files or People/ files for background.
 - YYYY-MM-DD: Initial notes, decisions, or context
 - YYYY-MM-DD: Updates, blockers, or progress
 ```
+
+## Task Statuses
+
+- **n (not_started)**: Ready to work on, no blockers
+- **s (started)**: Currently in progress
+- **b (blocked)**: Waiting on external dependency
+- **d (done)**: Completed
+- **p (pending)**: Waiting on decision or future timing
+- **q (question)**: Need more information before starting
 
 ## Goals Alignment
 
@@ -106,12 +120,26 @@ When processing backlog:
 ## Best Practices for Backlog Processing
 
 1. **Process ONE item at a time** - Don't batch create without user confirmation
-2. **Ask minimal questions** - Only what's needed to resolve ambiguity
-3. **Suggest defaults** - Offer category/priority suggestions based on content
-4. **Check duplicates first** - Always use deduplication before creating
-5. **Tie to goals immediately** - Write Context section referencing GOALS.md
-6. **Estimate time** - Provide realistic time estimates in minutes
-7. **Link resources** - Add relevant Knowledge/ or People/ files to resource_refs
+2. **Ask context questions** - If not provided, ask:
+   - What's it related to? (larger initiative/project)
+   - Any dependencies? (what it depends on or blocks)
+   - Why now? (timing rationale)
+3. **Ask minimal other questions** - Only what's needed to resolve ambiguity
+4. **Suggest defaults** - Offer category/priority suggestions based on content
+5. **Check duplicates first** - Always use deduplication before creating
+6. **Tie to goals immediately** - Write Context section referencing GOALS.md
+7. **Estimate time** - Provide realistic time estimates in minutes
+8. **Link resources** - Add relevant Knowledge/ or People/ files to resource_refs
+9. **Auto-link people** - If person mentioned, add to resource_refs and update their person file
+
+## People Management
+
+When creating or updating tasks:
+- **Detect person mentions** - Look for names in task content
+- **Add to resource_refs** - Include People/[Name].md in task frontmatter
+- **Update person file** - Add task to person's "Related Tasks/Projects" section
+- **Use Obsidian links** - Format as [[Task Name]] or [[Person Name]] for easy navigation
+- **Bidirectional linking** - Ensure both task and person file reference each other
 
 ## Interaction Style
 
