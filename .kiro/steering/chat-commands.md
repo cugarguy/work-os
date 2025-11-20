@@ -193,6 +193,17 @@ Execute the Other People file update workflow:
 5. Remove from Other People.md
 6. Update any references to point to new file
 
+## Meeting Notes - Natural Conversation
+When user indicates they're in a meeting (phrases like "in a meeting", "attending [meeting]", "meeting for [topic]"):
+1. Ask for meeting topic if not clear from context
+2. Create meeting notes file: Knowledge/[Topic]-Meeting-YYYY-MM-DD.md
+3. Enter note-taking mode - capture everything user shares
+4. When user indicates meeting is over, automatically process:
+   - Extract action items
+   - Ask: Create tasks? Update person files? Link to projects?
+   - Process responses and confirm completion
+5. If ever unclear about meeting status, ask for clarification
+
 ## Important
 - Always use the MCP tools (don't just read files manually)
 - Keep responses concise and actionable
