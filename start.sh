@@ -43,4 +43,4 @@ bash .kiro/hooks/check_closeouts.sh
 
 # Launch Kiro CLI with conversation resume and intelligent startup
 print_info "Launching Kiro Chat with session continuity..."
-exec kiro-cli chat --resume "Check session history, review closeout status, check current date/time, assess how much time has passed since our last interaction, then greet me and suggest what we should work on based on context."
+exec kiro-cli chat -a --resume "Check session history, review closeout status, check current date/time, assess how much time has passed since our last interaction, then greet me and suggest what we should work on based on context."

@@ -1,5 +1,9 @@
 # PersonalOS Configuration
 
+# API Tokens
+api_tokens:
+  quip: T1hMOU1BMldYd1Q=|1795193957|sGGG11WzB3Hvs1z6ziSEkWluzkd0QrpeYf2Pg1DrFIU=
+
 # Hooks
 hooks:
   - name: check_closeouts

@@ -6,6 +6,7 @@ A log of potential features, workflows, and improvements for the WorkOS Kiro age
 
 ## Meeting Management Workflow
 **Date Added:** 2025-11-19
+**Updated:** 2025-11-20
 
 **Idea:**
 Create a formal meeting process that includes:
@@ -20,7 +21,22 @@ Create a formal meeting process that includes:
 - Better context in person files
 - Project tracking through meeting history
 
-**Status:** Proposed
+**Status:** Implemented - Meeting notes workflow created in .kiro/steering/meeting-notes-workflow.md
+
+---
+
+## Auto-Approve Tools Flag
+**Date Added:** 2025-11-20
+
+**Idea:**
+Add `--trust-all-tools` flag to start.sh to auto-approve all tool calls, reducing friction during workflows.
+
+**Benefits:**
+- Faster workflow execution
+- Less interruption during multi-step processes
+- Better user experience
+
+**Status:** Implemented - Added to start.sh
 
 ---
 
