@@ -20,6 +20,12 @@ Every Monday morning:
 
 Trigger phrases: "close out today", "end of day", "daily closeout"
 
+**Interaction Style:**
+- Ask ONE question at a time
+- Wait for response before asking next question
+- Keep questions focused and specific
+- Don't batch multiple questions together
+
 **Steps:**
 1. Use `list_tasks` with `include_done=true` to see all tasks
 2. Identify tasks completed today (status='d', check Progress Log for today's date)
