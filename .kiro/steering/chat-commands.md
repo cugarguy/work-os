@@ -6,6 +6,17 @@ inclusion: always
 
 When the user says certain phrases in chat, execute the corresponding workflow:
 
+## "log it" or "track it" or "update logs" or "track all"
+Execute the log update workflow:
+1. Get current date and time
+2. Update session tracker with:
+   - Current task/activity
+   - Status
+   - Notes about recent work
+   - Next action
+3. Update or append to today's daily notes with recent work
+4. Confirm updates complete
+
 ## "triage backlog" or "process backlog" or "clear backlog"
 Execute the backlog processing workflow:
 1. Read #BACKLOG.md, #GOALS.md, #Tasks/, #Knowledge/
@@ -153,9 +164,13 @@ Execute the morning startup workflow:
 6. **Check for missing weekly closeout**: If Monday/Tuesday, check last Friday
    - Calculate last Friday: `date -v-Fri -v-7d +"%Y-%m-%d"`
    - If previous week not closed out → Run weekly closeout FIRST
-7. Then show today's priorities (P0/P1 tasks)
-8. Suggest 1-3 focus tasks for today
-9. Update session tracker with current day and week start
+7. **Check backlog**: Read BACKLOG.md
+   - If backlog has items → Run backlog processing workflow (triage backlog)
+   - Process items ONE AT A TIME
+   - Clear backlog before continuing
+8. Then show today's priorities (P0/P1 tasks)
+9. Suggest 1-3 focus tasks for today
+10. Update session tracker with current day and week start
 
 ## "start the week" or "weekly startup" or "begin the week"
 Execute the weekly startup workflow (see startup-workflows.md):

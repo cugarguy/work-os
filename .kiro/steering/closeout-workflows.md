@@ -27,19 +27,23 @@ Trigger phrases: "close out today", "end of day", "daily closeout"
 - Don't batch multiple questions together
 
 **Steps:**
-1. Use `list_tasks` with `include_done=true` to see all tasks
-2. Identify tasks completed today (status='d', check Progress Log for today's date)
-3. For each completed task, gather:
+1. **Process backlog FIRST**: Check if BACKLOG.md has items
+   - If yes → Run backlog processing workflow (triage backlog)
+   - Process items ONE AT A TIME
+   - Clear backlog before continuing closeout
+2. Use `list_tasks` with `include_done=true` to see all tasks
+3. Identify tasks completed today (status='d', check Progress Log for today's date)
+4. For each completed task, gather:
    - Task title and priority
    - Estimated time vs actual time (if tracked)
    - What was accomplished
-4. Identify tasks worked on but not completed (status='s')
-5. Ask about:
+5. Identify tasks worked on but not completed (status='s')
+6. Ask about:
    - Total productive time today
    - Any distractions or unplanned work
    - Blockers encountered
    - What went well / what didn't
-6. Create summary in `daily-notes/YYYY-MM-DD.md`:
+7. Create summary in `daily-notes/YYYY-MM-DD.md`:
    ```markdown
    # Daily Closeout - [Date]
    
@@ -63,8 +67,8 @@ Trigger phrases: "close out today", "end of day", "daily closeout"
    ## Tomorrow's Focus
    - Top 3 priorities for tomorrow
    ```
-7. Update session tracker with closeout completion
-8. Suggest top 3 priorities for tomorrow based on P0/P1 tasks
+8. Update session tracker with closeout completion
+9. Suggest top 3 priorities for tomorrow based on P0/P1 tasks
 
 ## Weekly Closeout Workflow
 
