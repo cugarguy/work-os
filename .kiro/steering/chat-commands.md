@@ -141,16 +141,41 @@ Execute the weekly closeout workflow:
 
 ## "start my day" or "good morning" or "begin work"
 Execute the morning startup workflow:
-1. **Get current date first**: Run `date +"%Y-%m-%d"` and `date +"%A"`
-2. Read session tracker for last_daily_closeout
-3. Calculate yesterday's date: `date -v-1d +"%Y-%m-%d"`
-4. If yesterday not closed out → Run daily closeout for yesterday FIRST
-5. If today is Monday, check last_weekly_closeout
-6. Calculate last Friday: `date -v-Fri -v-7d +"%Y-%m-%d"`
-7. If previous week not closed out → Run weekly closeout FIRST
-8. Then show today's priorities (P0/P1 tasks)
-9. Suggest 1-3 focus tasks for today
-10. Update session tracker with current day and week start
+1. **Get current date first**: Run `date +"%Y-%m-%d"`, `date +"%A"`, and `date +"%Y-%m"`
+2. Read session tracker
+3. **Check for monthly startup**: Compare current month to last_monthly_startup month
+   - If different month → Run monthly startup FIRST
+4. **Check for weekly startup**: If Monday or Tuesday AND last_weekly_startup < this Monday
+   - Calculate this Monday: `date -v-Mon +"%Y-%m-%d"`
+   - If last_weekly_startup before this Monday → Run weekly startup
+5. **Check for missing daily closeout**: Calculate yesterday's date
+   - If yesterday not closed out → Run daily closeout for yesterday FIRST
+6. **Check for missing weekly closeout**: If Monday/Tuesday, check last Friday
+   - Calculate last Friday: `date -v-Fri -v-7d +"%Y-%m-%d"`
+   - If previous week not closed out → Run weekly closeout FIRST
+7. Then show today's priorities (P0/P1 tasks)
+8. Suggest 1-3 focus tasks for today
+9. Update session tracker with current day and week start
+
+## "start the week" or "weekly startup" or "begin the week"
+Execute the weekly startup workflow (see startup-workflows.md):
+1. Check if previous week was closed out
+2. If not → Run weekly closeout FIRST
+3. Review project progress (parent tasks with subtasks)
+4. Show completion % and status for each project
+5. Identify blockers and delays
+6. Suggest priority adjustments
+7. Show this week's focus areas
+
+## "start the month" or "monthly startup" or "new month review"
+Execute the monthly startup workflow (see startup-workflows.md):
+1. Check if previous week was closed out
+2. If not → Run weekly closeout FIRST
+3. Review previous month (completed tasks, time, patterns)
+4. Review outstanding initiatives (all P0/P1 parent tasks)
+5. Review GOALS.md and assess progress
+6. Plan for the month (must complete, focus areas, adjustments)
+7. Update session tracker
 
 ## "add person" or "create person file"
 Execute the add person workflow:

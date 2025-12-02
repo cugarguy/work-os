@@ -35,8 +35,10 @@ date
 - Running weekly closeout ("close out this week")
 - Checking if closeouts are missing
 - Creating dated files (daily-notes/YYYY-MM-DD.md)
-- Determining if it's Monday (for weekly checks)
+- Determining if it's Monday or Tuesday (for weekly checks)
 - Calculating "yesterday" or "last week"
+- **Checking if new month started** (for monthly startup)
+- **Checking if new week started** (for weekly startup)
 
 ## Date Calculations
 

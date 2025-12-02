@@ -3,6 +3,8 @@
 # WorkOS Q Chat Launcher with Session Resume
 # Maintains conversation context across restarts
 
+cd /Users/bsteeger/Documents/1-projects/-agents/workOS/work-os/
+
 set -e
 
 # Colors

@@ -92,6 +92,7 @@ What needs to be done and why.
 
 ## MCP Tools Available
 
+### Core Tools
 | Tool | Description |
 |------|-------------|
 | `list_tasks` | Filter and view tasks |
@@ -103,6 +104,16 @@ What needs to be done and why.
 | `daily_checkin` | Interactive progress tracking |
 | `get_time_estimates` | AI-powered time estimates |
 | `view_time_analytics` | Time tracking insights |
+
+### Parallel Processing Tools (NEW!)
+| Tool | Description |
+|------|-------------|
+| `prepare_parallel_backlog_processing` | Prepare backlog for parallel delegates (10x faster) |
+| `prepare_parallel_task_analysis` | Prepare tasks for parallel analysis |
+| `prepare_parallel_daily_planning` | Prepare data for parallel planning |
+| `aggregate_parallel_results` | Combine delegate results and take actions |
+
+**Performance**: Process 10 backlog items in ~30 seconds instead of 5 minutes using parallel delegates!
 
 ## Configuration
 

@@ -853,6 +853,53 @@ async def handle_list_tools() -> list[types.Tool]:
                     "next_session_plan": {"type": "string", "description": "Plan for next session"}
                 }
             }
+        ),
+        types.Tool(
+            name="prepare_parallel_backlog_processing",
+            description="Prepare backlog items for parallel delegate processing - returns structured data for delegates",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "include_existing_tasks": {"type": "boolean", "description": "Include existing tasks context", "default": True}
+                }
+            }
+        ),
+        types.Tool(
+            name="prepare_parallel_task_analysis",
+            description="Prepare task data for parallel analysis by delegates - returns tasks grouped for parallel processing",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "analysis_types": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Types of analysis: priority, category, blockers, goal_alignment, time_estimates"
+                    }
+                }
+            }
+        ),
+        types.Tool(
+            name="prepare_parallel_daily_planning",
+            description="Prepare data for parallel daily planning delegates - returns context for smart task recommendations",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "include_goals": {"type": "boolean", "description": "Include goals context", "default": True},
+                    "include_knowledge": {"type": "boolean", "description": "Include knowledge base context", "default": False}
+                }
+            }
+        ),
+        types.Tool(
+            name="aggregate_parallel_results",
+            description="Aggregate results from parallel delegate operations and take final actions",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "operation_type": {"type": "string", "description": "Type: backlog_processing, task_analysis, daily_planning"},
+                    "delegate_results": {"type": "array", "items": {"type": "object"}, "description": "Results from delegates"},
+                    "auto_create_tasks": {"type": "boolean", "description": "Auto-create tasks from backlog results", "default": False}
+                }
+            }
         )
     ]
 
@@ -1614,6 +1661,346 @@ async def handle_call_tool(
             "completed_tasks": completed_tasks,
             "next_session_plan": next_session_plan
         }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "prepare_parallel_backlog_processing":
+        include_existing = arguments.get('include_existing_tasks', True) if arguments else True
+        
+        # Read backlog
+        backlog_file = BASE_DIR / 'BACKLOG.md'
+        if not backlog_file.exists():
+            return [types.TextContent(type="text", text=json.dumps({
+                "error": "BACKLOG.md not found"
+            }, indent=2))]
+        
+        with open(backlog_file, 'r') as f:
+            content = f.read().strip()
+        
+        if not content or content == 'all done!':
+            return [types.TextContent(type="text", text=json.dumps({
+                "message": "Backlog is already clear",
+                "items": []
+            }, indent=2))]
+        
+        # Parse backlog items
+        lines = content.split('\n')
+        items = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith('- ') or stripped.startswith('* '):
+                items.append(stripped[2:])
+            elif stripped and not stripped.startswith('#'):
+                # Capture non-list items too
+                items.append(stripped)
+        
+        # Get existing tasks for context
+        existing_tasks = []
+        if include_existing:
+            all_tasks = get_all_tasks()
+            existing_tasks = [
+                {
+                    "title": t.get('title', ''),
+                    "category": t.get('category', ''),
+                    "status": t.get('status', ''),
+                    "priority": t.get('priority', '')
+                }
+                for t in all_tasks if t.get('status') != 'd'
+            ]
+        
+        result = {
+            "operation": "parallel_backlog_processing",
+            "total_items": len(items),
+            "items": items,
+            "existing_tasks_count": len(existing_tasks),
+            "existing_tasks": existing_tasks[:50],  # Limit to 50 for context size
+            "delegate_instructions": {
+                "task": "Analyze this backlog item for duplicate detection, categorization, and task creation",
+                "check_for": [
+                    "Similarity to existing tasks (flag if >60% similar)",
+                    "Ambiguity (flag if too vague)",
+                    "Appropriate category (technical, outreach, research, writing, admin, personal, other)",
+                    "Suggested priority (P0-P3)",
+                    "Estimated time in minutes"
+                ],
+                "output_format": {
+                    "item": "original item text",
+                    "is_duplicate": "boolean",
+                    "similar_to": "list of similar task titles",
+                    "is_ambiguous": "boolean",
+                    "clarification_needed": "list of questions if ambiguous",
+                    "suggested_category": "category",
+                    "suggested_priority": "P0-P3",
+                    "estimated_time": "minutes",
+                    "ready_to_create": "boolean"
+                }
+            }
+        }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "prepare_parallel_task_analysis":
+        analysis_types = arguments.get('analysis_types', ['priority', 'category', 'blockers']) if arguments else ['priority', 'category', 'blockers']
+        
+        all_tasks = get_all_tasks()
+        active_tasks = [t for t in all_tasks if t.get('status') != 'd']
+        
+        # Read goals for context
+        goals_content = ""
+        goals_file = BASE_DIR / 'GOALS.md'
+        if goals_file.exists():
+            with open(goals_file, 'r') as f:
+                goals_content = f.read()
+        
+        result = {
+            "operation": "parallel_task_analysis",
+            "total_active_tasks": len(active_tasks),
+            "analysis_types": analysis_types,
+            "delegates": []
+        }
+        
+        # Create delegate configurations for each analysis type
+        if 'priority' in analysis_types:
+            result["delegates"].append({
+                "identifier": "priority_analysis",
+                "task": "Analyze priority distribution and balance",
+                "data": {
+                    "tasks_by_priority": {
+                        "P0": [t for t in active_tasks if t.get('priority') == 'P0'],
+                        "P1": [t for t in active_tasks if t.get('priority') == 'P1'],
+                        "P2": [t for t in active_tasks if t.get('priority') == 'P2'],
+                        "P3": [t for t in active_tasks if t.get('priority') == 'P3']
+                    },
+                    "limits": {"P0": 3, "P1": 7}
+                },
+                "output": "Priority balance assessment, overload warnings, recommendations"
+            })
+        
+        if 'category' in analysis_types:
+            by_category = {}
+            for task in active_tasks:
+                cat = task.get('category', 'other')
+                if cat not in by_category:
+                    by_category[cat] = []
+                by_category[cat].append(task)
+            
+            result["delegates"].append({
+                "identifier": "category_analysis",
+                "task": "Analyze work distribution by category",
+                "data": {"tasks_by_category": by_category},
+                "output": "Category distribution, time estimates by category, balance recommendations"
+            })
+        
+        if 'blockers' in analysis_types:
+            blocked_tasks = [t for t in active_tasks if t.get('status') == 'b']
+            started_tasks = [t for t in active_tasks if t.get('status') == 's']
+            
+            result["delegates"].append({
+                "identifier": "blocker_analysis",
+                "task": "Identify blockers and suggest unblocking actions",
+                "data": {
+                    "blocked_tasks": blocked_tasks,
+                    "started_tasks": started_tasks
+                },
+                "output": "Blocker summary, suggested actions to unblock, task dependencies"
+            })
+        
+        if 'goal_alignment' in analysis_types:
+            result["delegates"].append({
+                "identifier": "goal_alignment_analysis",
+                "task": "Assess how tasks align with stated goals",
+                "data": {
+                    "tasks": active_tasks,
+                    "goals": goals_content[:2000]  # Limit size
+                },
+                "output": "Goal alignment score, tasks not supporting goals, recommendations"
+            })
+        
+        if 'time_estimates' in analysis_types:
+            result["delegates"].append({
+                "identifier": "time_analysis",
+                "task": "Analyze time estimates and workload",
+                "data": {
+                    "tasks": active_tasks,
+                    "total_estimated_time": sum(t.get('estimated_time', 30) for t in active_tasks)
+                },
+                "output": "Total workload hours, realistic completion timeline, overcommitment warnings"
+            })
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "prepare_parallel_daily_planning":
+        include_goals = arguments.get('include_goals', True) if arguments else True
+        include_knowledge = arguments.get('include_knowledge', False) if arguments else False
+        
+        all_tasks = get_all_tasks()
+        active_tasks = [t for t in all_tasks if t.get('status') != 'd']
+        
+        # Get high priority tasks
+        p0_tasks = [t for t in active_tasks if t.get('priority') == 'P0']
+        p1_tasks = [t for t in active_tasks if t.get('priority') == 'P1']
+        started_tasks = [t for t in active_tasks if t.get('status') == 's']
+        
+        # Read goals
+        goals_content = ""
+        if include_goals:
+            goals_file = BASE_DIR / 'GOALS.md'
+            if goals_file.exists():
+                with open(goals_file, 'r') as f:
+                    goals_content = f.read()
+        
+        # Get recent knowledge files
+        knowledge_files = []
+        if include_knowledge:
+            knowledge_dir = BASE_DIR / 'Knowledge'
+            if knowledge_dir.exists():
+                for kfile in sorted(knowledge_dir.glob('*.md'), key=lambda x: x.stat().st_mtime, reverse=True)[:10]:
+                    knowledge_files.append({
+                        "filename": kfile.name,
+                        "modified": datetime.fromtimestamp(kfile.stat().st_mtime).isoformat()
+                    })
+        
+        # Get current time context
+        now = datetime.now()
+        time_context = {
+            "day": now.strftime('%A'),
+            "date": now.strftime('%Y-%m-%d'),
+            "hour": now.hour,
+            "time_of_day": "morning" if now.hour < 12 else "afternoon" if now.hour < 17 else "evening"
+        }
+        
+        result = {
+            "operation": "parallel_daily_planning",
+            "time_context": time_context,
+            "delegates": [
+                {
+                    "identifier": "priority_focus",
+                    "task": "Recommend top priority tasks for today",
+                    "data": {
+                        "p0_tasks": p0_tasks,
+                        "p1_tasks": p1_tasks,
+                        "time_available": "8 hours typical workday"
+                    },
+                    "output": "Top 3 tasks to focus on today with reasoning"
+                },
+                {
+                    "identifier": "momentum_tasks",
+                    "task": "Identify tasks with existing momentum",
+                    "data": {
+                        "started_tasks": started_tasks,
+                        "time_context": time_context
+                    },
+                    "output": "Tasks to continue, quick wins, momentum opportunities"
+                },
+                {
+                    "identifier": "goal_progress",
+                    "task": "Suggest tasks that advance key goals",
+                    "data": {
+                        "goals": goals_content[:2000] if goals_content else "No goals defined",
+                        "active_tasks": active_tasks[:30]
+                    },
+                    "output": "Goal-aligned task recommendations"
+                }
+            ],
+            "knowledge_context": knowledge_files if include_knowledge else []
+        }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "aggregate_parallel_results":
+        operation_type = arguments.get('operation_type')
+        delegate_results = arguments.get('delegate_results', [])
+        auto_create = arguments.get('auto_create_tasks', False)
+        
+        if not operation_type or not delegate_results:
+            return [types.TextContent(type="text", text=json.dumps({
+                "error": "Missing operation_type or delegate_results"
+            }, indent=2))]
+        
+        result = {
+            "operation": operation_type,
+            "delegates_processed": len(delegate_results),
+            "summary": {},
+            "actions_taken": [],
+            "recommendations": []
+        }
+        
+        if operation_type == "backlog_processing":
+            # Aggregate backlog processing results
+            ready_to_create = []
+            duplicates = []
+            needs_clarification = []
+            
+            for delegate_result in delegate_results:
+                if delegate_result.get('ready_to_create'):
+                    ready_to_create.append(delegate_result)
+                elif delegate_result.get('is_duplicate'):
+                    duplicates.append(delegate_result)
+                elif delegate_result.get('is_ambiguous'):
+                    needs_clarification.append(delegate_result)
+            
+            result["summary"] = {
+                "ready_to_create": len(ready_to_create),
+                "duplicates": len(duplicates),
+                "needs_clarification": len(needs_clarification)
+            }
+            
+            # Auto-create tasks if requested
+            if auto_create and ready_to_create:
+                for item_data in ready_to_create:
+                    title = item_data.get('item', '')
+                    category = item_data.get('suggested_category', 'other')
+                    priority = item_data.get('suggested_priority', 'P2')
+                    estimated_time = item_data.get('estimated_time', 60)
+                    
+                    # Create task file
+                    safe_filename = re.sub(r'[^\w\s-]', '', title)
+                    safe_filename = re.sub(r'[-\s]+', ' ', safe_filename).strip()
+                    filepath = TASKS_DIR / f"{safe_filename}.md"
+                    
+                    metadata = {
+                        'title': title,
+                        'category': category,
+                        'priority': priority,
+                        'status': 'n',
+                        'estimated_time': estimated_time,
+                        'created_date': datetime.now().strftime('%Y-%m-%d')
+                    }
+                    
+                    yaml_str = yaml.dump(metadata, default_flow_style=False, sort_keys=False)
+                    task_content = generate_task_content(title, category)
+                    file_content = f"---\n{yaml_str}---\n\n# {title}\n\n{task_content}"
+                    
+                    with open(filepath, 'w') as f:
+                        f.write(file_content)
+                    
+                    result["actions_taken"].append(f"Created task: {title}")
+            
+            result["duplicates"] = duplicates
+            result["needs_clarification"] = needs_clarification
+            result["ready_to_create"] = ready_to_create if not auto_create else []
+            
+        elif operation_type == "task_analysis":
+            # Aggregate analysis results
+            result["analysis_results"] = delegate_results
+            result["summary"] = {
+                "analyses_completed": len(delegate_results),
+                "analysis_types": [r.get('identifier', 'unknown') for r in delegate_results]
+            }
+            
+        elif operation_type == "daily_planning":
+            # Aggregate planning recommendations
+            all_recommendations = []
+            for delegate_result in delegate_results:
+                if 'recommendations' in delegate_result:
+                    all_recommendations.extend(delegate_result['recommendations'])
+            
+            result["recommendations"] = all_recommendations
+            result["planning_results"] = delegate_results
+            result["summary"] = {
+                "total_recommendations": len(all_recommendations),
+                "delegates_consulted": len(delegate_results)
+            }
         
         return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
     
