@@ -45,13 +45,13 @@ All 8 hook files renamed and updated:
 
 ### Directory Structure
 - **Old**: `personal-os/`
-- **New**: `work-os/`
+- **New**: `work-os/` (now at root)
 
 ### MCP Server
 - **Old Name**: `personalos`
 - **New Name**: `workos`
 - **Old Path**: `/Users/bsteeger/Documents/1-projects/workOS/personal-os/core/mcp/server.py`
-- **New Path**: `/Users/bsteeger/Documents/1-projects/workOS/work-os/core/mcp/server.py`
+- **New Path**: `/Users/bsteeger/Documents/1-projects/workOS/core/mcp/server.py`
 
 ### Hook Names
 All hook display names updated from "PersonalOS [Feature]" to "WorkOS [Feature]"

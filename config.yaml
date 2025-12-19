@@ -1,4 +1,4 @@
-# PersonalOS Configuration
+# WorkOS Configuration - Knowledge and Time Intelligence System
 
 # API Tokens
 api_tokens:
@@ -10,48 +10,50 @@ hooks:
     event: AgentSpawn
     command: .kiro/hooks/check_closeouts.sh
 
-# Task categories
-categories:
-  - technical      # Build, fix, configure
-  - outreach       # Communicate, meet
-  - research       # Learn, analyze
-  - writing        # Draft, document
+# Time Tracking Settings
+time_tracking:
+  default_time_window_days: 90  # Default historical window for analysis
+  min_work_duration_minutes: 5  # Minimum duration to record
+  auto_save_interval_minutes: 15  # Auto-save work in progress
+  timezone: UTC  # Default timezone for time entries
+
+# Work Types (for time categorization and estimation)
+work_types:
+  - technical      # Build, fix, configure, code
+  - outreach       # Communicate, meet, collaborate
+  - research       # Learn, analyze, investigate
+  - writing        # Draft, document, create content
   - admin          # Operations, finance, logistics
-  - personal       # Health, routines
+  - planning       # Strategy, design, architecture
+  - review         # Code review, document review, feedback
+  - meeting        # Scheduled meetings and discussions
+  - learning       # Training, courses, skill development
   - other          # Everything else
 
-# Priority levels
-priorities:
-  - P0  # Critical/Urgent - Must do THIS WEEK
-  - P1  # Important - This month
-  - P2  # Normal - Scheduled work
-  - P3  # Low - Nice to have
+# Distraction Categories
+distraction_types:
+  - meeting        # Unscheduled meetings or calls
+  - notification   # Email, Slack, alerts
+  - question       # Colleague questions or requests
+  - context_switch # Switching between different work
+  - break          # Intentional breaks
+  - technical      # Technical issues, debugging tools
+  - other          # Other interruptions
 
-# Status codes
-statuses:
-  n: not_started
-  s: started
-  b: blocked
-  d: done
+# Work Breakdown Settings
+work_breakdown:
+  complexity_threshold_minutes: 120  # Suggest breakdown for work > 2 hours
+  min_chunk_size_minutes: 30  # Minimum size for breakdown chunks
+  max_chunk_size_minutes: 120  # Maximum size for breakdown chunks
 
-# Deduplication settings
-deduplication:
-  similarity_threshold: 0.6  # How similar before flagging (0-1)
-  check_categories: true     # Consider category in matching
-  check_keywords: true       # Use keyword overlap
+# Estimation Settings
+estimation:
+  confidence_interval: 0.8  # 80% confidence interval for estimates
+  min_similar_samples: 3  # Minimum historical samples for estimates
+  recency_weight: 0.7  # Weight recent work more heavily (0-1)
 
-# Priority limits (warning thresholds)
-priority_limits:
-  P0: 3  # Warn if more than 3 P0 tasks
-  P1: 7  # Warn if more than 7 P1 tasks
-
-# Task aging (in days)
-task_aging:
-  prune_completed_after: 30  # Delete done tasks after 30 days
-  flag_stale_after: 14       # Flag inactive tasks after 14 days
-
-# Category keywords for auto-categorization
-category_keywords:
+# Work Type Keywords (for auto-categorization)
+work_type_keywords:
   technical:
     - code
     - api
@@ -66,6 +68,8 @@ category_keywords:
     - dashboard
     - dataset
     - migration
+    - build
+    - configure
   outreach:
     - email
     - contact
@@ -77,6 +81,8 @@ category_keywords:
     - connect
     - 1:1
     - alignment
+    - collaborate
+    - sync
   research:
     - research
     - study
@@ -110,3 +116,27 @@ category_keywords:
     - spreadsheet
     - metrics
     - WBR
+  planning:
+    - design
+    - architecture
+    - plan
+    - roadmap
+    - strategy
+    - brainstorm
+  review:
+    - review
+    - feedback
+    - critique
+    - assess
+  meeting:
+    - meeting
+    - standup
+    - retrospective
+    - planning
+    - sync
+  learning:
+    - training
+    - course
+    - tutorial
+    - workshop
+    - certification

@@ -8,7 +8,7 @@
 The directory reorganization completed earlier is still in place:
 
 ```
-work-os/
+workOS/
 ├── docs/                    # Documentation ✅
 │   ├── README.md
 │   ├── QUICK-START.md

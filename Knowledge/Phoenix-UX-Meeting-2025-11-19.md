@@ -1,5 +1,7 @@
 # Phoenix UX Meeting - November 19, 2025
 
+**Related:** [[Common-Platform-UI-Meeting-2025-12-04]] - Follow-up meeting on local console design
+
 ## Meeting Info
 - **Date:** 2025-11-19
 - **Topic:** Phoenix UX
@@ -57,4 +59,4 @@
 - 
 
 ## Related
-- [[Project: Phoenix]]
+- [[2-knowledgebase/Phoenix/Project-Management/Project: Phoenix]]

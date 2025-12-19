@@ -3,10 +3,10 @@
     "workos": {
       "command": "python3.11",
       "args": [
-        "/Users/bsteeger/Documents/1-projects/workOS/work-os/core/mcp/server.py"
+        "/Users/bsteeger/Documents/1-projects/-agents/workOS/core/mcp/server.py"
       ],
       "env": {
-        "MANAGER_AI_BASE_DIR": "/Users/bsteeger/Documents/1-projects/workOS/work-os"
+        "MANAGER_AI_BASE_DIR": "/Users/bsteeger/Documents/1-projects/-agents/workOS"
       },
       "disabled": false,
       "autoApprove": [

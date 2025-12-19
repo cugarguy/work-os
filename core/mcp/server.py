@@ -8,7 +8,7 @@ import json
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import Counter
 
 import yaml
@@ -18,6 +18,15 @@ from mcp.server import Server, NotificationOptions
 from mcp.server.models import InitializationOptions
 import mcp.server.stdio
 import mcp.types as types
+
+# Import knowledge management components
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from knowledge_manager import KnowledgeManager
+from wikilink_resolver import WikilinkResolver
+from people_manager import PeopleManager
+from time_intelligence import TimeIntelligence
+from notes_processor import NotesProcessor
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +38,13 @@ TASKS_DIR = BASE_DIR / 'Tasks'
 
 # Ensure directories exist
 TASKS_DIR.mkdir(exist_ok=True, parents=True)
+
+# Initialize knowledge management components
+knowledge_manager = KnowledgeManager(BASE_DIR)
+wikilink_resolver = WikilinkResolver(BASE_DIR)
+people_manager = PeopleManager(BASE_DIR)
+time_intelligence = TimeIntelligence(BASE_DIR)
+notes_processor = NotesProcessor(BASE_DIR)
 
 # Duplicate detection configuration
 DEDUP_CONFIG = {
@@ -715,7 +731,7 @@ async def handle_list_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="process_backlog",
-            description="Read and return backlog contents",
+            description="[DEPRECATED] Use process_notes_inbox instead. Read and return backlog contents",
             inputSchema={"type": "object", "properties": {}}
         ),
         types.Tool(
@@ -898,6 +914,355 @@ async def handle_list_tools() -> list[types.Tool]:
                     "operation_type": {"type": "string", "description": "Type: backlog_processing, task_analysis, daily_planning"},
                     "delegate_results": {"type": "array", "items": {"type": "object"}, "description": "Results from delegates"},
                     "auto_create_tasks": {"type": "boolean", "description": "Auto-create tasks from backlog results", "default": False}
+                }
+            }
+        ),
+        # Knowledge Management Tools
+        types.Tool(
+            name="create_knowledge",
+            description="Create a new knowledge document with YAML frontmatter and wikilinks",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "title": {"type": "string", "description": "Document title"},
+                    "content": {"type": "string", "description": "Document content (markdown)"},
+                    "links": {"type": "array", "items": {"type": "string"}, "description": "List of wikilinks to include", "default": []},
+                    "tags": {"type": "array", "items": {"type": "string"}, "description": "Optional list of tags", "default": []},
+                    "related_people": {"type": "array", "items": {"type": "string"}, "description": "Optional list of related people (as wikilinks)", "default": []}
+                },
+                "required": ["title", "content"]
+            }
+        ),
+        types.Tool(
+            name="update_knowledge",
+            description="Update an existing knowledge document",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "doc_id": {"type": "string", "description": "Document identifier (filename without .md)"},
+                    "updates": {
+                        "type": "object",
+                        "description": "Dictionary of updates to apply",
+                        "properties": {
+                            "content": {"type": "string", "description": "New content"},
+                            "tags": {"type": "array", "items": {"type": "string"}, "description": "New tags"},
+                            "related_people": {"type": "array", "items": {"type": "string"}, "description": "New related people"},
+                            "time_invested": {"type": "integer", "description": "New time invested in minutes"}
+                        }
+                    }
+                },
+                "required": ["doc_id", "updates"]
+            }
+        ),
+        types.Tool(
+            name="search_knowledge",
+            description="Search knowledge base using full-text search and connection ranking",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query string"},
+                    "max_results": {"type": "integer", "description": "Maximum number of results to return", "default": 10}
+                },
+                "required": ["query"]
+            }
+        ),
+        types.Tool(
+            name="get_related_knowledge",
+            description="Get related knowledge documents by traversing the wikilink graph",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "doc_id": {"type": "string", "description": "Document identifier (filename without .md)"},
+                    "depth": {"type": "integer", "description": "How many levels deep to traverse", "default": 1}
+                },
+                "required": ["doc_id"]
+            }
+        ),
+        types.Tool(
+            name="validate_wikilinks",
+            description="Validate all wikilinks in a document and identify broken links",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "doc_id": {"type": "string", "description": "Document identifier (filename without .md), or omit to validate all documents"},
+                },
+            }
+        ),
+        # People Management Tools
+        types.Tool(
+            name="create_person",
+            description="Create a new person profile with structured metadata",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Person's name"},
+                    "metadata": {
+                        "type": "object",
+                        "description": "Optional metadata",
+                        "properties": {
+                            "role": {"type": "string", "description": "Job role/title"},
+                            "team": {"type": "string", "description": "Team name"},
+                            "expertise_areas": {"type": "array", "items": {"type": "string"}, "description": "List of knowledge area wikilinks"},
+                            "relationships": {"type": "array", "items": {"type": "object"}, "description": "List of relationship objects"},
+                            "content": {"type": "string", "description": "Profile content (markdown)"}
+                        }
+                    }
+                },
+                "required": ["name"]
+            }
+        ),
+        types.Tool(
+            name="update_person",
+            description="Update an existing person profile",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "person_id": {"type": "string", "description": "Person identifier (filename without .md)"},
+                    "updates": {
+                        "type": "object",
+                        "description": "Dictionary of updates to apply",
+                        "properties": {
+                            "content": {"type": "string", "description": "New content"},
+                            "role": {"type": "string", "description": "New role"},
+                            "team": {"type": "string", "description": "New team"},
+                            "expertise_areas": {"type": "array", "items": {"type": "string"}, "description": "New expertise areas"},
+                            "relationships": {"type": "array", "items": {"type": "object"}, "description": "New relationships"},
+                            "total_collaboration_time": {"type": "integer", "description": "New total collaboration time in minutes"}
+                        }
+                    }
+                },
+                "required": ["person_id", "updates"]
+            }
+        ),
+        types.Tool(
+            name="link_person_to_knowledge",
+            description="Create a bidirectional link between a person and a knowledge document",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "person_id": {"type": "string", "description": "Person identifier (filename without .md)"},
+                    "knowledge_id": {"type": "string", "description": "Knowledge document identifier (filename without .md)"},
+                    "context": {"type": "string", "description": "Optional context for the link", "default": ""}
+                },
+                "required": ["person_id", "knowledge_id"]
+            }
+        ),
+        types.Tool(
+            name="link_people",
+            description="Create a relationship link between two people",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "person1_id": {"type": "string", "description": "First person identifier (filename without .md)"},
+                    "person2_id": {"type": "string", "description": "Second person identifier (filename without .md)"},
+                    "relationship": {"type": "string", "description": "Type of relationship (e.g., 'collaborator', 'reports_to', 'manager')"},
+                    "context": {"type": "string", "description": "Optional context describing the relationship", "default": ""}
+                },
+                "required": ["person1_id", "person2_id", "relationship"]
+            }
+        ),
+        types.Tool(
+            name="find_expertise",
+            description="Find people with expertise in a given topic by searching knowledge connections",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "topic": {"type": "string", "description": "Topic or knowledge area to search for"}
+                },
+                "required": ["topic"]
+            }
+        ),
+        # Time Tracking Tools
+        types.Tool(
+            name="start_work",
+            description="Start tracking work time with description, type, and optional knowledge/people references",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "description": {"type": "string", "description": "Description of the work being performed"},
+                    "work_type": {"type": "string", "description": "Type/category of work (e.g., 'technical', 'writing', 'meeting')", "default": "general"},
+                    "knowledge_refs": {"type": "array", "items": {"type": "string"}, "description": "List of related knowledge document names"},
+                    "people_refs": {"type": "array", "items": {"type": "string"}, "description": "List of related people names"}
+                },
+                "required": ["description"]
+            }
+        ),
+        types.Tool(
+            name="end_work",
+            description="End work tracking and calculate duration",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "work_id": {"type": "string", "description": "Unique identifier of the work entry"},
+                    "completion_notes": {"type": "string", "description": "Notes about work completion", "default": ""},
+                    "completion_percentage": {"type": "integer", "description": "Percentage of work completed (0-100)"}
+                },
+                "required": ["work_id"]
+            }
+        ),
+        types.Tool(
+            name="record_distraction",
+            description="Record a distraction event during work",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "work_id": {"type": "string", "description": "Unique identifier of the work entry"},
+                    "distraction_type": {"type": "string", "description": "Type of distraction (e.g., 'meeting', 'interruption', 'email')"},
+                    "duration_minutes": {"type": "integer", "description": "Duration of the distraction in minutes"},
+                    "description": {"type": "string", "description": "Optional description of the distraction", "default": ""}
+                },
+                "required": ["work_id", "distraction_type", "duration_minutes"]
+            }
+        ),
+        types.Tool(
+            name="get_time_history",
+            description="Get time history with optional filters by work type, knowledge area, or person",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "work_type": {"type": "string", "description": "Filter by work type"},
+                    "knowledge_ref": {"type": "string", "description": "Filter by knowledge document name"},
+                    "person_ref": {"type": "string", "description": "Filter by person name"},
+                    "days": {"type": "integer", "description": "Number of days to look back", "default": 30}
+                }
+            }
+        ),
+        types.Tool(
+            name="get_time_estimate",
+            description="Get time estimate for work based on historical patterns, with optional distraction and experience adjustments",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "work_description": {"type": "string", "description": "Description of the work to estimate"},
+                    "work_type": {"type": "string", "description": "Type of work"},
+                    "knowledge_refs": {"type": "array", "items": {"type": "string"}, "description": "List of related knowledge document names"},
+                    "people_refs": {"type": "array", "items": {"type": "string"}, "description": "List of people involved (for collaboration adjustment)"},
+                    "include_distraction_overhead": {"type": "boolean", "description": "Factor in typical distraction overhead", "default": False},
+                    "adjust_for_experience": {"type": "boolean", "description": "Adjust estimate based on experience level in knowledge areas", "default": False},
+                    "adjust_for_collaboration": {"type": "boolean", "description": "Adjust estimate based on collaboration history with specified people", "default": False}
+                },
+                "required": ["work_description", "work_type"]
+            }
+        ),
+        types.Tool(
+            name="suggest_work_breakdown",
+            description="Suggest a logical breakdown of work into smaller chunks with estimates",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "work_description": {"type": "string", "description": "Description of the work to break down"},
+                    "work_type": {"type": "string", "description": "Type of work"},
+                    "knowledge_refs": {"type": "array", "items": {"type": "string"}, "description": "List of related knowledge document names"},
+                    "accept_breakdown": {"type": "boolean", "description": "Automatically accept and create time entries for chunks", "default": False}
+                },
+                "required": ["work_description", "work_type"]
+            }
+        ),
+        # Notes Processing Tools
+        types.Tool(
+            name="process_notes_inbox",
+            description="Process notes from the Notes Inbox file in batch mode. Extracts entities, creates/updates knowledge and people documents, then clears the inbox.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "notes_file": {"type": "string", "description": "Optional path to notes file (defaults to NOTES_INBOX.md)"}
+                }
+            }
+        ),
+        types.Tool(
+            name="process_notes_interactive",
+            description="Start an interactive notes processing session. Presents notes one at a time, asks clarifying questions, and waits for user confirmation.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "notes_file": {"type": "string", "description": "Optional path to notes file (defaults to NOTES_INBOX.md)"}
+                }
+            }
+        ),
+        types.Tool(
+            name="process_interactive_note",
+            description="Process the next note in an interactive session. Extracts entities, detects ambiguities, and generates clarification questions.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "session_id": {"type": "string", "description": "The interactive session ID"},
+                    "clarifications": {"type": "object", "description": "Optional clarifications from previous questions"},
+                    "confirmed": {"type": "boolean", "description": "Whether to confirm and apply updates", "default": False},
+                    "advance": {"type": "boolean", "description": "Whether to advance to next note", "default": False}
+                },
+                "required": ["session_id"]
+            }
+        ),
+        types.Tool(
+            name="process_conversational_note",
+            description="Process a note from real-time conversation. Analyzes content, detects entities, asks clarifying questions, and proposes updates.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "note_text": {"type": "string", "description": "The note text from conversation"},
+                    "context": {"type": "object", "description": "Optional context from previous conversation turns"},
+                    "apply_updates": {"type": "boolean", "description": "Whether to apply proposed updates", "default": False},
+                    "proposed_updates": {"type": "array", "description": "Proposed updates to apply (if apply_updates is true)"}
+                },
+                "required": ["note_text"]
+            }
+        ),
+        types.Tool(
+            name="process_meeting_notes",
+            description="Process meeting notes with attendees and topics. Extracts knowledge, updates person profiles, and creates connections.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "attendees": {"type": "array", "items": {"type": "string"}, "description": "List of attendee names"},
+                    "topics": {"type": "array", "items": {"type": "string"}, "description": "List of topics discussed"},
+                    "notes": {"type": "string", "description": "Meeting notes text"},
+                    "date": {"type": "string", "description": "Meeting date (ISO format)"}
+                },
+                "required": ["attendees", "topics", "notes"]
+            }
+        ),
+        # Analysis Tools
+        types.Tool(
+            name="get_distraction_analysis",
+            description="Analyze distraction patterns by time of day, day of week, and work type. Identifies when distractions occur most frequently and calculates their impact on work duration.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "days": {"type": "integer", "description": "Number of days to analyze (default: all time)"},
+                    "work_type": {"type": "string", "description": "Filter by specific work type (default: all types)"},
+                    "include_impact": {"type": "boolean", "description": "Include distraction impact calculation (default: true)", "default": True}
+                }
+            }
+        ),
+        types.Tool(
+            name="get_expertise_analysis",
+            description="Analyze expertise by ranking knowledge areas by time investment. Shows which topics have received the most time and attention.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "min_minutes": {"type": "integer", "description": "Minimum time threshold in minutes (default: 60)", "default": 60}
+                }
+            }
+        ),
+        types.Tool(
+            name="get_collaboration_analysis",
+            description="Identify frequent collaborators and collaboration patterns. Shows who you work with most, collaboration time by work type, and solo vs collaborative work breakdown.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "days": {"type": "integer", "description": "Number of days to analyze (default: all time)"}
+                }
+            }
+        ),
+        types.Tool(
+            name="get_time_trends",
+            description="Get time trends grouped by knowledge area over time. Shows how time investment in different topics changes over time periods.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "knowledge_ref": {"type": "string", "description": "Specific knowledge area to analyze (default: all areas)"},
+                    "days": {"type": "integer", "description": "Number of days to analyze (default: 90)", "default": 90},
+                    "group_by": {"type": "string", "description": "Grouping period: 'day', 'week', or 'month' (default: 'week')", "default": "week"}
                 }
             }
         )
@@ -2000,6 +2365,1203 @@ async def handle_call_tool(
             result["summary"] = {
                 "total_recommendations": len(all_recommendations),
                 "delegates_consulted": len(delegate_results)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    # Knowledge Management Tools
+    elif name == "create_knowledge":
+        title = arguments['title']
+        content = arguments['content']
+        links = arguments.get('links', [])
+        tags = arguments.get('tags', [])
+        related_people = arguments.get('related_people', [])
+        
+        try:
+            doc_path = knowledge_manager.create_knowledge(
+                title=title,
+                content=content,
+                links=links,
+                tags=tags,
+                related_people=related_people
+            )
+            
+            result = {
+                "success": True,
+                "doc_id": doc_path.stem,
+                "path": str(doc_path),
+                "message": f"Knowledge document '{title}' created successfully"
+            }
+        except Exception as e:
+            logger.error(f"Error creating knowledge document: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "update_knowledge":
+        doc_id = arguments['doc_id']
+        updates = arguments['updates']
+        
+        try:
+            success = knowledge_manager.update_knowledge(doc_id, updates)
+            
+            if success:
+                result = {
+                    "success": True,
+                    "doc_id": doc_id,
+                    "message": f"Knowledge document '{doc_id}' updated successfully"
+                }
+            else:
+                result = {
+                    "success": False,
+                    "error": f"Failed to update document '{doc_id}'"
+                }
+        except Exception as e:
+            logger.error(f"Error updating knowledge document: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "search_knowledge":
+        query = arguments['query']
+        max_results = arguments.get('max_results', 10)
+        
+        try:
+            results = knowledge_manager.search_knowledge(query, max_results)
+            
+            result = {
+                "success": True,
+                "query": query,
+                "count": len(results),
+                "results": results
+            }
+        except Exception as e:
+            logger.error(f"Error searching knowledge: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "get_related_knowledge":
+        doc_id = arguments['doc_id']
+        depth = arguments.get('depth', 1)
+        
+        try:
+            related = knowledge_manager.get_related_knowledge(doc_id, depth)
+            
+            # Also get backlinks
+            backlinks = knowledge_manager.get_backlinks(doc_id)
+            
+            result = {
+                "success": True,
+                "doc_id": doc_id,
+                "depth": depth,
+                "related_count": len(related),
+                "related_documents": related,
+                "backlinks_count": len(backlinks),
+                "backlinks": backlinks
+            }
+        except Exception as e:
+            logger.error(f"Error getting related knowledge: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "validate_wikilinks":
+        doc_id = arguments.get('doc_id') if arguments else None
+        
+        try:
+            if doc_id:
+                # Validate single document
+                doc_path = wikilink_resolver.resolve_link(doc_id)
+                if not doc_path or not doc_path.exists():
+                    result = {
+                        "success": False,
+                        "error": f"Document not found: {doc_id}"
+                    }
+                else:
+                    broken_links = wikilink_resolver.validate_links(doc_path)
+                    result = {
+                        "success": True,
+                        "doc_id": doc_id,
+                        "path": str(doc_path),
+                        "broken_links_count": len(broken_links),
+                        "broken_links": broken_links
+                    }
+            else:
+                # Validate all documents in Knowledge directory
+                knowledge_dir = BASE_DIR / 'Knowledge'
+                all_broken = []
+                
+                for doc_path in knowledge_dir.glob('*.md'):
+                    broken_links = wikilink_resolver.validate_links(doc_path)
+                    if broken_links:
+                        all_broken.append({
+                            "doc_id": doc_path.stem,
+                            "path": str(doc_path),
+                            "broken_links": broken_links
+                        })
+                
+                result = {
+                    "success": True,
+                    "documents_checked": len(list(knowledge_dir.glob('*.md'))),
+                    "documents_with_broken_links": len(all_broken),
+                    "broken_links": all_broken
+                }
+        except Exception as e:
+            logger.error(f"Error validating wikilinks: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    # People Management Tools
+    elif name == "create_person":
+        person_name = arguments['name']
+        metadata = arguments.get('metadata')
+        
+        try:
+            person_path = people_manager.create_person(person_name, metadata)
+            
+            result = {
+                "success": True,
+                "person_id": person_path.stem,
+                "path": str(person_path),
+                "message": f"Person profile '{person_name}' created successfully"
+            }
+        except Exception as e:
+            logger.error(f"Error creating person profile: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "update_person":
+        person_id = arguments['person_id']
+        updates = arguments['updates']
+        
+        try:
+            success = people_manager.update_person(person_id, updates)
+            
+            if success:
+                result = {
+                    "success": True,
+                    "person_id": person_id,
+                    "message": f"Person profile '{person_id}' updated successfully"
+                }
+            else:
+                result = {
+                    "success": False,
+                    "error": f"Failed to update person profile '{person_id}'"
+                }
+        except Exception as e:
+            logger.error(f"Error updating person profile: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "link_person_to_knowledge":
+        person_id = arguments['person_id']
+        knowledge_id = arguments['knowledge_id']
+        context = arguments.get('context', '')
+        
+        try:
+            success = people_manager.link_to_knowledge(person_id, knowledge_id, context)
+            
+            if success:
+                result = {
+                    "success": True,
+                    "person_id": person_id,
+                    "knowledge_id": knowledge_id,
+                    "message": f"Linked '{person_id}' to '{knowledge_id}' successfully"
+                }
+            else:
+                result = {
+                    "success": False,
+                    "error": f"Failed to link '{person_id}' to '{knowledge_id}'"
+                }
+        except Exception as e:
+            logger.error(f"Error linking person to knowledge: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "link_people":
+        person1_id = arguments['person1_id']
+        person2_id = arguments['person2_id']
+        relationship = arguments['relationship']
+        context = arguments.get('context', '')
+        
+        try:
+            success = people_manager.link_people(person1_id, person2_id, relationship, context)
+            
+            if success:
+                result = {
+                    "success": True,
+                    "person1_id": person1_id,
+                    "person2_id": person2_id,
+                    "relationship": relationship,
+                    "message": f"Linked '{person1_id}' to '{person2_id}' with relationship '{relationship}'"
+                }
+            else:
+                result = {
+                    "success": False,
+                    "error": f"Failed to link '{person1_id}' to '{person2_id}'"
+                }
+        except Exception as e:
+            logger.error(f"Error linking people: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "find_expertise":
+        topic = arguments['topic']
+        
+        try:
+            experts = people_manager.find_expertise(topic)
+            
+            result = {
+                "success": True,
+                "topic": topic,
+                "count": len(experts),
+                "experts": experts
+            }
+        except Exception as e:
+            logger.error(f"Error finding expertise: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    # Time Tracking Tools
+    elif name == "start_work":
+        description = arguments['description']
+        work_type = arguments.get('work_type', 'general')
+        knowledge_refs = arguments.get('knowledge_refs', [])
+        people_refs = arguments.get('people_refs', [])
+        
+        try:
+            work_id = time_intelligence.start_work(
+                description=description,
+                work_type=work_type,
+                knowledge_refs=knowledge_refs,
+                people_refs=people_refs
+            )
+            
+            result = {
+                "success": True,
+                "work_id": work_id,
+                "description": description,
+                "work_type": work_type,
+                "knowledge_refs": knowledge_refs,
+                "people_refs": people_refs,
+                "message": f"Started tracking work: {description}"
+            }
+        except Exception as e:
+            logger.error(f"Error starting work: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "end_work":
+        work_id = arguments['work_id']
+        completion_notes = arguments.get('completion_notes', '')
+        completion_percentage = arguments.get('completion_percentage')
+        
+        try:
+            time_entry = time_intelligence.end_work(
+                work_id=work_id,
+                completion_notes=completion_notes,
+                completion_percentage=completion_percentage
+            )
+            
+            if time_entry:
+                result = {
+                    "success": True,
+                    "work_id": work_id,
+                    "duration_minutes": time_entry.duration_minutes,
+                    "work_description": time_entry.work_description,
+                    "work_type": time_entry.work_type,
+                    "start_time": time_entry.start_time,
+                    "end_time": time_entry.end_time,
+                    "completion_percentage": time_entry.completion_percentage,
+                    "notes": time_entry.notes,
+                    "message": f"Completed work tracking: {time_entry.duration_minutes} minutes"
+                }
+            else:
+                result = {
+                    "success": False,
+                    "error": f"Work entry not found: {work_id}"
+                }
+        except Exception as e:
+            logger.error(f"Error ending work: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "record_distraction":
+        work_id = arguments['work_id']
+        distraction_type = arguments['distraction_type']
+        duration_minutes = arguments['duration_minutes']
+        description = arguments.get('description', '')
+        
+        try:
+            success = time_intelligence.record_distraction(
+                work_id=work_id,
+                distraction_type=distraction_type,
+                duration_minutes=duration_minutes,
+                description=description
+            )
+            
+            if success:
+                result = {
+                    "success": True,
+                    "work_id": work_id,
+                    "distraction_type": distraction_type,
+                    "duration_minutes": duration_minutes,
+                    "message": f"Recorded {distraction_type} distraction: {duration_minutes} minutes"
+                }
+            else:
+                result = {
+                    "success": False,
+                    "error": f"Work entry not found: {work_id}"
+                }
+        except Exception as e:
+            logger.error(f"Error recording distraction: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "get_time_history":
+        work_type = arguments.get('work_type')
+        knowledge_ref = arguments.get('knowledge_ref')
+        person_ref = arguments.get('person_ref')
+        days = arguments.get('days', 30)
+        
+        try:
+            # Get entries based on filters
+            if knowledge_ref:
+                entries = time_intelligence.get_entries_by_knowledge(knowledge_ref)
+            elif person_ref:
+                entries = time_intelligence.get_entries_by_person(person_ref)
+            elif work_type:
+                entries = time_intelligence.get_entries_by_work_type(work_type)
+            else:
+                entries = time_intelligence.get_all_entries()
+            
+            # Filter by date if days specified
+            if days:
+                cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
+                entries = [
+                    e for e in entries
+                    if e.start_time and datetime.fromisoformat(e.start_time) >= cutoff_date
+                ]
+            
+            # Convert to dict for JSON serialization
+            entries_data = [
+                {
+                    "id": e.id,
+                    "start_time": e.start_time,
+                    "end_time": e.end_time,
+                    "duration_minutes": e.duration_minutes,
+                    "work_description": e.work_description,
+                    "work_type": e.work_type,
+                    "knowledge_refs": e.knowledge_refs,
+                    "people_refs": e.people_refs,
+                    "distractions": e.distractions,
+                    "completion_percentage": e.completion_percentage,
+                    "notes": e.notes
+                }
+                for e in entries
+            ]
+            
+            # Calculate summary statistics
+            completed_entries = [e for e in entries if e.duration_minutes is not None]
+            total_minutes = sum(e.duration_minutes for e in completed_entries)
+            
+            result = {
+                "success": True,
+                "count": len(entries),
+                "completed_count": len(completed_entries),
+                "total_minutes": total_minutes,
+                "total_hours": round(total_minutes / 60, 1),
+                "filters": {
+                    "work_type": work_type,
+                    "knowledge_ref": knowledge_ref,
+                    "person_ref": person_ref,
+                    "days": days
+                },
+                "entries": entries_data
+            }
+        except Exception as e:
+            logger.error(f"Error getting time history: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "get_time_estimate":
+        work_description = arguments['work_description']
+        work_type = arguments['work_type']
+        knowledge_refs = arguments.get('knowledge_refs', [])
+        people_refs = arguments.get('people_refs', [])
+        include_distraction_overhead = arguments.get('include_distraction_overhead', False)
+        adjust_for_experience = arguments.get('adjust_for_experience', False)
+        adjust_for_collaboration = arguments.get('adjust_for_collaboration', False)
+        
+        try:
+            # Choose the appropriate estimation method based on flags
+            if adjust_for_collaboration and people_refs:
+                estimate = time_intelligence.generate_collaboration_adjusted_estimate(
+                    work_description=work_description,
+                    work_type=work_type,
+                    people_refs=people_refs,
+                    knowledge_refs=knowledge_refs
+                )
+            elif adjust_for_experience and knowledge_refs:
+                estimate = time_intelligence.generate_experience_adjusted_estimate(
+                    work_description=work_description,
+                    work_type=work_type,
+                    knowledge_refs=knowledge_refs
+                )
+            elif include_distraction_overhead:
+                estimate = time_intelligence.generate_estimate_with_distraction_overhead(
+                    work_description=work_description,
+                    work_type=work_type,
+                    knowledge_refs=knowledge_refs
+                )
+            else:
+                estimate = time_intelligence.generate_estimate(
+                    work_description=work_description,
+                    work_type=work_type,
+                    knowledge_refs=knowledge_refs
+                )
+            
+            if estimate:
+                result = {
+                    "success": True,
+                    "work_description": work_description,
+                    "work_type": work_type,
+                    "estimate": {
+                        "mean_minutes": estimate.mean_minutes,
+                        "mean_hours": round(estimate.mean_minutes / 60, 1),
+                        "min_estimate": estimate.min_estimate,
+                        "max_estimate": estimate.max_estimate,
+                        "confidence_range_minutes": estimate.confidence_range,
+                        "confidence_range_hours": (
+                            round(estimate.confidence_range[0] / 60, 1),
+                            round(estimate.confidence_range[1] / 60, 1)
+                        ),
+                        "variance": estimate.variance,
+                        "std_dev": estimate.std_dev,
+                        "similar_work_count": estimate.similar_work_count,
+                        "similar_work_ids": estimate.similar_work_ids,
+                        "explanation": estimate.explanation
+                    },
+                    "adjustments_applied": {
+                        "distraction_overhead": include_distraction_overhead,
+                        "experience_level": adjust_for_experience,
+                        "collaboration_history": adjust_for_collaboration
+                    }
+                }
+            else:
+                result = {
+                    "success": False,
+                    "error": "No similar work found to generate estimate",
+                    "work_description": work_description,
+                    "work_type": work_type,
+                    "suggestion": "Try a different work type or add more historical data"
+                }
+        except Exception as e:
+            logger.error(f"Error generating estimate: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "suggest_work_breakdown":
+        work_description = arguments['work_description']
+        work_type = arguments['work_type']
+        knowledge_refs = arguments.get('knowledge_refs', [])
+        accept_breakdown = arguments.get('accept_breakdown', False)
+        
+        try:
+            breakdown = time_intelligence.suggest_breakdown(
+                work_description=work_description,
+                work_type=work_type,
+                knowledge_refs=knowledge_refs
+            )
+            
+            if breakdown:
+                # Convert chunks to dict for JSON serialization
+                chunks_data = [
+                    {
+                        "id": chunk.id,
+                        "description": chunk.description,
+                        "estimated_minutes": chunk.estimated_minutes,
+                        "estimated_hours": round(chunk.estimated_minutes / 60, 1),
+                        "work_type": chunk.work_type,
+                        "knowledge_refs": chunk.knowledge_refs,
+                        "dependencies": chunk.dependencies
+                    }
+                    for chunk in breakdown.chunks
+                ]
+                
+                result = {
+                    "success": True,
+                    "original_work": breakdown.original_work,
+                    "breakdown_id": breakdown.breakdown_id,
+                    "total_chunks": len(breakdown.chunks),
+                    "estimated_total_minutes": breakdown.estimated_total,
+                    "estimated_total_hours": round(breakdown.estimated_total / 60, 1),
+                    "chunks": chunks_data,
+                    "created_at": breakdown.created_at
+                }
+                
+                # If accept_breakdown is True, create time entries for each chunk
+                if accept_breakdown:
+                    work_ids = time_intelligence.accept_breakdown(breakdown)
+                    result["accepted"] = True
+                    result["work_ids"] = work_ids
+                    result["message"] = f"Breakdown accepted. Created {len(work_ids)} time tracking entries."
+                else:
+                    result["accepted"] = False
+                    result["message"] = "Breakdown suggested. Set 'accept_breakdown' to true to create time entries."
+            else:
+                result = {
+                    "success": False,
+                    "error": "Work complexity is too low to suggest breakdown",
+                    "work_description": work_description,
+                    "suggestion": "This work item appears simple enough to track as a single entry"
+                }
+        except Exception as e:
+            logger.error(f"Error suggesting work breakdown: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "process_notes_inbox":
+        notes_file = arguments.get('notes_file')
+        notes_file_path = Path(notes_file) if notes_file else None
+        
+        try:
+            # Process notes in batch mode
+            processing_result = notes_processor.process_batch(notes_file_path)
+            
+            # Apply updates using knowledge_manager and people_manager
+            applied_updates = {
+                "knowledge_created": [],
+                "knowledge_updated": [],
+                "people_created": [],
+                "people_updated": [],
+                "errors": []
+            }
+            
+            # Create/update knowledge documents
+            for title in processing_result.knowledge_created:
+                try:
+                    # Find the note content for this knowledge topic
+                    # For now, create a basic document
+                    doc_path = knowledge_manager.create_knowledge(
+                        title=title,
+                        content=f"# {title}\n\nCreated from notes inbox processing.",
+                        tags=[],
+                        links=[]
+                    )
+                    applied_updates["knowledge_created"].append(str(doc_path))
+                except Exception as e:
+                    logger.error(f"Error creating knowledge '{title}': {e}")
+                    applied_updates["errors"].append(f"Failed to create knowledge '{title}': {str(e)}")
+            
+            for title in processing_result.knowledge_updated:
+                try:
+                    # Update existing knowledge document
+                    success = knowledge_manager.update_knowledge(
+                        doc_id=title,
+                        additional_content=f"\n\nUpdated from notes inbox processing on {datetime.now().strftime('%Y-%m-%d')}."
+                    )
+                    if success:
+                        applied_updates["knowledge_updated"].append(title)
+                except Exception as e:
+                    logger.error(f"Error updating knowledge '{title}': {e}")
+                    applied_updates["errors"].append(f"Failed to update knowledge '{title}': {str(e)}")
+            
+            # Create/update person profiles
+            for name in processing_result.people_created:
+                try:
+                    person_path = people_manager.create_person(
+                        name=name,
+                        role="",
+                        team="",
+                        metadata={}
+                    )
+                    applied_updates["people_created"].append(str(person_path))
+                except Exception as e:
+                    logger.error(f"Error creating person '{name}': {e}")
+                    applied_updates["errors"].append(f"Failed to create person '{name}': {str(e)}")
+            
+            for name in processing_result.people_updated:
+                try:
+                    success = people_manager.update_person(
+                        person_id=name,
+                        additional_context=f"Mentioned in notes inbox on {datetime.now().strftime('%Y-%m-%d')}."
+                    )
+                    if success:
+                        applied_updates["people_updated"].append(name)
+                except Exception as e:
+                    logger.error(f"Error updating person '{name}': {e}")
+                    applied_updates["errors"].append(f"Failed to update person '{name}': {str(e)}")
+            
+            result = {
+                "success": True,
+                "processed_count": processing_result.processed_count,
+                "summary": processing_result.summary,
+                "applied_updates": applied_updates,
+                "processing_errors": processing_result.errors
+            }
+        except Exception as e:
+            logger.error(f"Error processing notes inbox: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "process_notes_interactive":
+        notes_file = arguments.get('notes_file')
+        notes_file_path = Path(notes_file) if notes_file else None
+        
+        try:
+            # Start interactive session
+            session = notes_processor.process_interactive(notes_file_path)
+            
+            # Store session in memory (in production, would use proper session storage)
+            if not hasattr(notes_processor, '_sessions'):
+                notes_processor._sessions = {}
+            notes_processor._sessions[session.session_id] = session
+            
+            result = {
+                "success": True,
+                "session_id": session.session_id,
+                "total_notes": len(session.notes),
+                "current_index": session.current_index,
+                "message": f"Interactive session started with {len(session.notes)} notes to process"
+            }
+        except Exception as e:
+            logger.error(f"Error starting interactive session: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "process_interactive_note":
+        session_id = arguments['session_id']
+        clarifications = arguments.get('clarifications', {})
+        confirmed = arguments.get('confirmed', False)
+        advance = arguments.get('advance', False)
+        
+        try:
+            # Retrieve session
+            if not hasattr(notes_processor, '_sessions') or session_id not in notes_processor._sessions:
+                return [types.TextContent(type="text", text=json.dumps({
+                    "success": False,
+                    "error": f"Session not found: {session_id}"
+                }, indent=2))]
+            
+            session = notes_processor._sessions[session_id]
+            
+            # If clarifications provided, incorporate them
+            if clarifications and session.current_index < len(session.processed_notes):
+                processed_note = notes_processor.incorporate_clarifications(
+                    session, 
+                    session.current_index, 
+                    clarifications
+                )
+                
+                result = {
+                    "success": True,
+                    "session_id": session_id,
+                    "clarifications_incorporated": True,
+                    "note_index": session.current_index,
+                    "requires_confirmation": True,
+                    "message": "Clarifications incorporated. Please confirm to apply updates."
+                }
+            
+            # If confirmed, apply updates
+            elif confirmed and session.current_index < len(session.processed_notes):
+                update_result = notes_processor.confirm_updates(session, session.current_index, True)
+                
+                # Apply the updates using knowledge_manager and people_manager
+                applied = []
+                errors = []
+                
+                for update in update_result.get('updates', []):
+                    try:
+                        action = update.get('action')
+                        if action == 'create_knowledge':
+                            doc_path = knowledge_manager.create_knowledge(
+                                title=update['title'],
+                                content=update['content'],
+                                tags=[],
+                                links=[]
+                            )
+                            applied.append(f"Created knowledge: {update['title']}")
+                        elif action == 'update_knowledge':
+                            success = knowledge_manager.update_knowledge(
+                                doc_id=update['title'],
+                                additional_content=update['additional_content']
+                            )
+                            if success:
+                                applied.append(f"Updated knowledge: {update['title']}")
+                        elif action == 'create_person':
+                            person_path = people_manager.create_person(
+                                name=update['name'],
+                                role="",
+                                team="",
+                                metadata={"context": update['context']}
+                            )
+                            applied.append(f"Created person: {update['name']}")
+                        elif action == 'update_person':
+                            success = people_manager.update_person(
+                                person_id=update['name'],
+                                additional_context=update['additional_context']
+                            )
+                            if success:
+                                applied.append(f"Updated person: {update['name']}")
+                    except Exception as e:
+                        logger.error(f"Error applying update: {e}")
+                        errors.append(f"Failed to apply {action}: {str(e)}")
+                
+                result = {
+                    "success": True,
+                    "session_id": session_id,
+                    "updates_applied": True,
+                    "note_index": session.current_index,
+                    "applied_updates": applied,
+                    "errors": errors
+                }
+            
+            # If advance, move to next note
+            elif advance:
+                notes_processor.advance_session(session)
+                
+                # Process next note if available
+                if session.current_index < len(session.notes):
+                    processed_note = notes_processor.process_next_note(session)
+                    
+                    if processed_note:
+                        result = {
+                            "success": True,
+                            "session_id": session_id,
+                            "note_index": session.current_index,
+                            "note_text": processed_note.original_text,
+                            "note_type": processed_note.note_type,
+                            "requires_clarification": processed_note.requires_clarification,
+                            "clarification_questions": processed_note.clarification_questions,
+                            "entities": [e.to_dict() for e in processed_note.entities],
+                            "remaining_notes": len(session.notes) - session.current_index - 1
+                        }
+                    else:
+                        result = {
+                            "success": False,
+                            "session_id": session_id,
+                            "error": "Failed to process note"
+                        }
+                else:
+                    result = {
+                        "success": True,
+                        "session_id": session_id,
+                        "session_complete": True,
+                        "message": "All notes processed"
+                    }
+            
+            # Otherwise, just process current note
+            else:
+                processed_note = notes_processor.process_next_note(session)
+                
+                if processed_note:
+                    result = {
+                        "success": True,
+                        "session_id": session_id,
+                        "note_index": session.current_index,
+                        "note_text": processed_note.original_text,
+                        "note_type": processed_note.note_type,
+                        "requires_clarification": processed_note.requires_clarification,
+                        "clarification_questions": processed_note.clarification_questions,
+                        "entities": [e.to_dict() for e in processed_note.entities],
+                        "remaining_notes": len(session.notes) - session.current_index - 1
+                    }
+                else:
+                    result = {
+                        "success": True,
+                        "session_id": session_id,
+                        "session_complete": True,
+                        "message": "All notes processed"
+                    }
+        
+        except Exception as e:
+            logger.error(f"Error processing interactive note: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "process_conversational_note":
+        note_text = arguments['note_text']
+        context = arguments.get('context')
+        apply_updates = arguments.get('apply_updates', False)
+        proposed_updates = arguments.get('proposed_updates', [])
+        
+        try:
+            if apply_updates and proposed_updates:
+                # Apply the proposed updates
+                apply_result = notes_processor.apply_conversational_updates(proposed_updates, True)
+                
+                # Actually apply using knowledge_manager and people_manager
+                applied = []
+                errors = []
+                
+                for update in apply_result.get('updates', []):
+                    try:
+                        update_type = update.get('type')
+                        if update_type == 'knowledge_created':
+                            doc_path = knowledge_manager.create_knowledge(
+                                title=update['title'],
+                                content=update['content'],
+                                tags=[],
+                                links=[]
+                            )
+                            applied.append(f"Created knowledge: {update['title']}")
+                        elif update_type == 'knowledge_updated':
+                            success = knowledge_manager.update_knowledge(
+                                doc_id=update['title'],
+                                additional_content=update['additional_content']
+                            )
+                            if success:
+                                applied.append(f"Updated knowledge: {update['title']}")
+                        elif update_type == 'person_created':
+                            person_path = people_manager.create_person(
+                                name=update['name'],
+                                role="",
+                                team="",
+                                metadata={"context": update['context']}
+                            )
+                            applied.append(f"Created person: {update['name']}")
+                        elif update_type == 'person_updated':
+                            success = people_manager.update_person(
+                                person_id=update['name'],
+                                additional_context=update['additional_context']
+                            )
+                            if success:
+                                applied.append(f"Updated person: {update['name']}")
+                    except Exception as e:
+                        logger.error(f"Error applying update: {e}")
+                        errors.append(f"Failed to apply {update_type}: {str(e)}")
+                
+                result = {
+                    "success": True,
+                    "updates_applied": True,
+                    "applied_updates": applied,
+                    "errors": errors,
+                    "message": apply_result.get('message', '')
+                }
+            else:
+                # Process the note and propose updates
+                response = notes_processor.process_conversational(note_text, context)
+                
+                result = {
+                    "success": True,
+                    "entities_detected": [e.to_dict() for e in response.entities_detected],
+                    "clarification_questions": response.clarification_questions,
+                    "proposed_updates": response.proposed_updates,
+                    "requires_confirmation": response.requires_confirmation
+                }
+        except Exception as e:
+            logger.error(f"Error processing conversational note: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "process_meeting_notes":
+        attendees = arguments['attendees']
+        topics = arguments['topics']
+        notes = arguments['notes']
+        date = arguments.get('date', datetime.now().isoformat())
+        
+        try:
+            # Process meeting notes
+            meeting_data = {
+                'attendees': attendees,
+                'topics': topics,
+                'notes': notes,
+                'date': date
+            }
+            
+            meeting_result = notes_processor.process_meeting_notes(meeting_data)
+            
+            # Apply updates using knowledge_manager and people_manager
+            applied_updates = {
+                "knowledge_created": [],
+                "knowledge_updated": [],
+                "people_updated": [],
+                "connections_created": [],
+                "errors": []
+            }
+            
+            # Create/update knowledge documents for topics
+            for topic in meeting_result.knowledge_created:
+                try:
+                    doc_path = knowledge_manager.create_knowledge(
+                        title=topic,
+                        content=f"# {topic}\n\nDiscussed in meeting {meeting_result.meeting_id}\n\n{notes}",
+                        tags=["meeting"],
+                        links=[]
+                    )
+                    applied_updates["knowledge_created"].append(str(doc_path))
+                except Exception as e:
+                    logger.error(f"Error creating knowledge '{topic}': {e}")
+                    applied_updates["errors"].append(f"Failed to create knowledge '{topic}': {str(e)}")
+            
+            for topic in meeting_result.knowledge_updated:
+                try:
+                    success = knowledge_manager.update_knowledge(
+                        doc_id=topic,
+                        additional_content=f"\n\n## Meeting Notes - {date}\n\n{notes}"
+                    )
+                    if success:
+                        applied_updates["knowledge_updated"].append(topic)
+                except Exception as e:
+                    logger.error(f"Error updating knowledge '{topic}': {e}")
+                    applied_updates["errors"].append(f"Failed to update knowledge '{topic}': {str(e)}")
+            
+            # Update person profiles for attendees
+            for attendee in meeting_result.people_updated:
+                try:
+                    success = people_manager.update_person(
+                        person_id=attendee,
+                        additional_context=f"Attended meeting on {date}. Topics: {', '.join(topics)}"
+                    )
+                    if success:
+                        applied_updates["people_updated"].append(attendee)
+                except Exception as e:
+                    logger.error(f"Error updating person '{attendee}': {e}")
+                    applied_updates["errors"].append(f"Failed to update person '{attendee}': {str(e)}")
+            
+            # Create connections
+            for connection in meeting_result.connections_created:
+                try:
+                    if connection['type'] == 'person_to_knowledge':
+                        success = people_manager.link_to_knowledge(
+                            person_id=connection['source'],
+                            knowledge_id=connection['target'],
+                            context=connection['context']
+                        )
+                        if success:
+                            applied_updates["connections_created"].append(
+                                f"{connection['source']} -> {connection['target']}"
+                            )
+                except Exception as e:
+                    logger.error(f"Error creating connection: {e}")
+                    applied_updates["errors"].append(f"Failed to create connection: {str(e)}")
+            
+            result = {
+                "success": True,
+                "meeting_id": meeting_result.meeting_id,
+                "summary": meeting_result.summary,
+                "applied_updates": applied_updates
+            }
+        except Exception as e:
+            logger.error(f"Error processing meeting notes: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    # Analysis Tools
+    elif name == "get_distraction_analysis":
+        days = arguments.get('days')
+        work_type = arguments.get('work_type')
+        include_impact = arguments.get('include_impact', True)
+        
+        try:
+            # Get distraction patterns
+            patterns = time_intelligence.analyze_distraction_patterns(
+                days=days,
+                work_type=work_type
+            )
+            
+            result = {
+                "success": True,
+                "patterns": patterns
+            }
+            
+            # Add impact analysis if requested
+            if include_impact:
+                impact = time_intelligence.calculate_distraction_impact(work_type=work_type)
+                result["impact"] = impact
+            
+            # Add filters info
+            result["filters"] = {
+                "days": days if days else "all time",
+                "work_type": work_type if work_type else "all types"
+            }
+            
+        except Exception as e:
+            logger.error(f"Error analyzing distractions: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "get_expertise_analysis":
+        min_minutes = arguments.get('min_minutes', 60)
+        
+        try:
+            # Get expertise ranking by time investment
+            expertise_areas = time_intelligence.rank_expertise_by_time(min_minutes=min_minutes)
+            
+            result = {
+                "success": True,
+                "expertise_areas": expertise_areas,
+                "total_areas": len(expertise_areas),
+                "min_minutes_threshold": min_minutes
+            }
+            
+            # Add summary statistics
+            if expertise_areas:
+                total_time = sum(area["total_minutes"] for area in expertise_areas)
+                result["summary"] = {
+                    "total_time_minutes": total_time,
+                    "total_time_hours": round(total_time / 60, 1),
+                    "top_expertise": expertise_areas[0]["knowledge_ref"] if expertise_areas else None,
+                    "top_expertise_hours": round(expertise_areas[0]["total_minutes"] / 60, 1) if expertise_areas else 0
+                }
+            
+        except Exception as e:
+            logger.error(f"Error analyzing expertise: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "get_collaboration_analysis":
+        days = arguments.get('days')
+        
+        try:
+            # Get collaboration patterns
+            patterns = time_intelligence.identify_collaboration_patterns(days=days)
+            
+            result = {
+                "success": True,
+                "patterns": patterns,
+                "filters": {
+                    "days": days if days else "all time"
+                }
+            }
+            
+            # Add summary insights
+            if patterns["frequent_collaborators"]:
+                top_collaborator = patterns["frequent_collaborators"][0]
+                result["summary"] = {
+                    "top_collaborator": top_collaborator["person_ref"],
+                    "top_collaborator_hours": round(top_collaborator["total_minutes"] / 60, 1),
+                    "collaboration_percentage": round(patterns["collaboration_percentage"], 1),
+                    "total_collaborators": len(patterns["frequent_collaborators"])
+                }
+            
+        except Exception as e:
+            logger.error(f"Error analyzing collaboration: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "get_time_trends":
+        knowledge_ref = arguments.get('knowledge_ref')
+        days = arguments.get('days', 90)
+        group_by = arguments.get('group_by', 'week')
+        
+        try:
+            # Get time trends
+            trends = time_intelligence.get_time_trends_by_knowledge(
+                knowledge_ref=knowledge_ref,
+                days=days,
+                group_by=group_by
+            )
+            
+            result = {
+                "success": True,
+                "trends": trends,
+                "filters": {
+                    "knowledge_ref": knowledge_ref if knowledge_ref else "all areas",
+                    "days": days,
+                    "group_by": group_by
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Error analyzing time trends: {e}")
+            result = {
+                "success": False,
+                "error": str(e)
             }
         
         return [types.TextContent(type="text", text=json.dumps(result, indent=2))]

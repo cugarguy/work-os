@@ -9,7 +9,7 @@ Reorganized root directory to reduce clutter and improve maintainability while k
 ## New Structure
 
 ```
-work-os/
+workOS/
 ├── docs/                    # Documentation (moved)
 │   ├── README.md
 │   ├── QUICK-START.md

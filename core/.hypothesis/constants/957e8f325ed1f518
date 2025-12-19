@@ -1,0 +1,4 @@
+# file: /Users/bsteeger/Documents/1-projects/-agents/workOS/work-os/core/knowledge_manager.py
+# hypothesis_version: 6.148.5
+
+[100, 200, '"', '%Y-%m-%d', "'", '*.md', '-', '---', '...', 'Knowledge', '[<>:"/\\\\|?*]', '\\s+', 'content', 'context', 'created_date', 'depth', 'id', 'path', 'r', 'related_people', 'score', 'snippet', 'source', 'source_path', 'tags', 'time_invested', 'title', 'updated_date', 'utf-8']
