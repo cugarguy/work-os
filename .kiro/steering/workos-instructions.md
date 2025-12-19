@@ -10,8 +10,10 @@ You are helping manage tasks using the WorkOS system. This workspace uses a goal
 
 - **GOALS.md**: User's strategic direction, quarterly objectives, and priority framework
 - **BACKLOG.md**: Inbox for unstructured notes and ideas
-- **Tasks/**: Individual task files with YAML frontmatter
-- **Knowledge/**: Reference documents, meeting notes, specs
+- **Tasks/**: Individual task files with YAML frontmatter (stored in consolidated knowledgebase)
+- **Knowledge/**: Reference documents, meeting notes, specs (stored in consolidated knowledgebase)
+- **People/**: Person profiles and relationship context (stored in consolidated knowledgebase)
+- **Consolidated Store**: Primary knowledge repository at `2-knowledgebase/-common/`
 
 ## MCP Tools Available
 
@@ -23,6 +25,8 @@ You are helping manage tasks using the WorkOS system. This workspace uses a goal
 - `check_priority_limits`: Check if overloaded
 - `get_system_status`: Comprehensive status
 - `prune_completed_tasks`: Clean old completed tasks
+
+**Note**: All MCP tools now access the consolidated knowledgebase at `2-knowledgebase/-common/` instead of local directories. See `data-sources.md` for configuration details.
 
 ## Priority Framework
 

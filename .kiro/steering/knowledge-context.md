@@ -5,11 +5,13 @@ fileMatchPattern: "Knowledge/*.md"
 
 # Knowledge Base Context
 
-When working with files in the Knowledge/ directory:
+**IMPORTANT**: Knowledge files are now stored in the consolidated knowledgebase at `2-knowledgebase/-common/Knowledge/`. See `data-sources.md` for complete configuration.
+
+When working with knowledge files:
 
 ## Purpose
 
-Knowledge/ stores:
+Knowledge/ stores (in consolidated knowledgebase at `2-knowledgebase/-common/Knowledge/`):
 - Reference documentation and specs
 - Meeting notes (non-personal)
 - Research findings and analysis

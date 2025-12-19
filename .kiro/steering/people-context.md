@@ -5,7 +5,9 @@ fileMatchPattern: "People/*.md"
 
 # People File Context
 
-When working with person files in the People/ directory:
+**IMPORTANT**: People files are now stored in the consolidated knowledgebase at `2-knowledgebase/-common/People/`. See `data-sources.md` for complete configuration.
+
+When working with person files:
 
 ## File Naming Convention
 
