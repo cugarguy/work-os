@@ -18,22 +18,22 @@ Execute the log update workflow:
 4. Confirm updates complete
 
 ## "triage backlog" or "process backlog" or "clear backlog"
-Execute the backlog processing workflow:
-1. Read #BACKLOG.md, #GOALS.md, #Tasks/, #Knowledge/
+Execute the backlog processing workflow (UPDATED - Direct File Access):
+1. Read BACKLOG.md, GOALS.md, and consolidated knowledgebase files
 2. Extract actionable items from backlog
-3. Use process_backlog_with_dedup to check for duplicates
+3. For each item, check for duplicates manually or use create_task MCP (has built-in validation)
 4. Process items ONE AT A TIME interactively
 5. Ask questions about category, priority, details as needed
-6. Create tasks with full Context sections tied to GOALS.md
-7. Clear backlog when done
+6. Create tasks using create_task MCP for validation OR direct file creation for simple tasks
+7. Clear backlog using: `fsWrite("BACKLOG.md", "all done!")`
 
 ## "process capture" or "triage capture" or "clear capture"
 Execute the capture processing workflow:
-1. Read #CAPTURE.md, #GOALS.md, #Tasks/, #Knowledge/
+1. Read CAPTURE.md, GOALS.md, and consolidated knowledgebase files
 2. Extract items from capture file
 3. For each item, ask: Task, Knowledge, Goal update, Skip, or Delete?
 4. If Task: use process_backlog_with_dedup, create with full Context
-5. If Knowledge: ask for filename, save to Knowledge/
+5. If Knowledge: ask for filename, save to consolidated knowledgebase
 6. If Goal: ask which section to update in GOALS.md
 7. If Skip: leave in CAPTURE.md, move to next
 8. If Delete: remove from CAPTURE.md
@@ -50,11 +50,12 @@ Execute the daily focus workflow:
 6. Flag any blocked tasks
 
 ## "mark done" or "complete task" or "finish task"
-Execute the task completion workflow:
-1. Use list_tasks to show active tasks
+Execute the task completion workflow (UPDATED - Direct File Access):
+1. Use list_tasks MCP to show active tasks
 2. Ask which task to mark as done
-3. Use update_task_status to mark it 'd'
-4. Confirm and show remaining P0/P1 tasks
+3. Update task status using direct file access: `strReplace(task_file, "status: s", "status: d")`
+4. Add completion date to progress log: `strReplace(task_file, "## Progress Log", f"## Progress Log\n- {date}: Task completed")`
+5. Confirm and show remaining P0/P1 tasks
 
 ## "show priorities" or "what's urgent" or "p0 tasks" or "show me today's priorities"
 Execute the priority view workflow:
@@ -64,12 +65,12 @@ Execute the priority view workflow:
 4. Keep it concise
 
 ## "weekly review" or "what did I accomplish" or "clean up old tasks"
-Execute the weekly review workflow:
-1. Use list_tasks with include_done=true
+Execute the weekly review workflow (UPDATED - Direct File Access):
+1. Use list_tasks MCP with include_done=true
 2. Summarize accomplishments tied to goals
-3. Use get_task_summary for current workload
-4. Use check_priority_limits to check if overloaded
-5. Ask about pruning old completed tasks (use prune_completed_tasks)
+3. Use get_task_summary MCP for current workload
+4. Use check_priority_limits MCP to check if overloaded
+5. Ask about pruning old completed tasks (use direct file operations to delete old .md files)
 6. Suggest goals needing attention
 
 ## "review backlog" or "prioritize tasks" or "review priorities"
@@ -121,7 +122,7 @@ Execute the daily closeout workflow:
 3. Identify tasks completed today (check Progress Log for today's date)
 4. Identify tasks in progress (status='s')
 5. Ask about: productive time, distractions, blockers, reflections
-6. Create summary in daily-notes/YYYY-MM-DD.md with:
+6. Create summary in knowledgebase/-common/Daily/YYYY-MM-DD.md with:
    - Completed tasks with time spent
    - In progress tasks
    - Time summary (productive, distractions, unplanned)
@@ -131,22 +132,22 @@ Execute the daily closeout workflow:
 8. Suggest tomorrow's focus based on P0/P1 tasks
 
 ## "close out this week" or "weekly closeout" or "end of week"
-Execute the weekly closeout workflow:
+Execute the weekly closeout workflow (UPDATED - Direct File Access):
 1. **Get current date first**: Run `date +"%Y-%m-%d"` and calculate week dates
 2. Calculate this Monday: `date -v-Mon +"%Y-%m-%d"`
-3. Use list_tasks with include_done=true
+3. Use list_tasks MCP with include_done=true
 4. Identify tasks completed this week (check Progress Log for dates >= this Monday)
 5. Group by priority and link to goals
 6. Ask about: total time, major accomplishments, distractions, goal progress
-7. Create summary in daily-notes/weekly-closeout-YYYY-MM-DD.md with:
+7. Create summary in knowledgebase/-common/Daily/weekly-closeout-YYYY-MM-DD.md with:
    - Completed tasks by priority with goal alignment
    - In progress tasks with blockers
    - Time summary and patterns
    - Goal progress assessment
    - Reflections and wins
    - Next week's priorities
-8. Use check_priority_limits to assess workload
-9. Optionally use prune_completed_tasks
+8. Use check_priority_limits MCP to assess workload
+9. Optionally use direct file operations to prune old completed tasks
 10. Update session tracker: set last_weekly_closeout to today's date
 11. Suggest next week's focus
 
@@ -236,7 +237,7 @@ Execute the Other People file update workflow:
 ## Meeting Notes - Natural Conversation
 When user indicates they're in a meeting (phrases like "in a meeting", "attending [meeting]", "meeting for [topic]"):
 1. Ask for meeting topic if not clear from context
-2. Create meeting notes file: Knowledge/[Topic]-Meeting-YYYY-MM-DD.md
+2. Create meeting notes file: Topics/[Topic]-Meeting-YYYY-MM-DD.md
 3. Enter note-taking mode - capture everything user shares
 4. When user indicates meeting is over, automatically process:
    - Extract action items

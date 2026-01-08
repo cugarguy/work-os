@@ -1,0 +1,45 @@
+{
+  "mcpServers": {
+    "workos": {
+      "command": "python3.11",
+      "args": [
+        "/Users/bsteeger/Documents/1-projects/-agents/workOS/core/mcp/server.py"
+      ],
+      "env": {
+        "MANAGER_AI_BASE_DIR": "/Users/bsteeger/Documents/1-projects/-agents/workOS"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_tasks",
+        "get_task_summary",
+        "process_backlog",
+        "process_backlog_with_dedup",
+        "process_backlog_smart",
+        "create_task",
+        "update_task_status",
+        "clear_backlog",
+        "check_priority_limits",
+        "get_system_status",
+        "prune_completed_tasks",
+        "daily_checkin",
+        "get_time_estimates",
+        "view_time_analytics",
+        "view_distraction_analytics",
+        "update_session",
+        "get_session_status",
+        "end_session",
+        "get_time_history"
+      ]
+    },
+    "builder-mcp": {
+      "command": "builder-mcp",
+      "env": {},
+      "disabled": true,
+      "autoApprove": [
+        "ReadInternalWebsites",
+        "InternalSearch",
+        "BrazilBuildAnalyzerTool"
+      ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "WorkOS Git Commit",
+  "description": "Commit Tasks to local git",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Commit tasks to local git:\n\n1. Run: git add Tasks/ GOALS.md Knowledge/ .kiro/ config.yaml\n2. Run: git commit -m \"Update tasks - [current date]\"\n3. Confirm commit successful and show commit hash\n4. Run: git log --oneline -5 to show recent commits"
+  }
+}

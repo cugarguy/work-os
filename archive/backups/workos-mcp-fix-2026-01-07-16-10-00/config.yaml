@@ -1,0 +1,142 @@
+# WorkOS Configuration - Knowledge and Time Intelligence System
+
+# API Tokens
+api_tokens:
+  quip: T1hMOU1BMldYd1Q=|1795193957|sGGG11WzB3Hvs1z6ziSEkWluzkd0QrpeYf2Pg1DrFIU=
+
+# Hooks
+hooks:
+  - name: check_closeouts
+    event: AgentSpawn
+    command: .kiro/hooks/check_closeouts.sh
+
+# Time Tracking Settings
+time_tracking:
+  default_time_window_days: 90  # Default historical window for analysis
+  min_work_duration_minutes: 5  # Minimum duration to record
+  auto_save_interval_minutes: 15  # Auto-save work in progress
+  timezone: UTC  # Default timezone for time entries
+
+# Work Types (for time categorization and estimation)
+work_types:
+  - technical      # Build, fix, configure, code
+  - outreach       # Communicate, meet, collaborate
+  - research       # Learn, analyze, investigate
+  - writing        # Draft, document, create content
+  - admin          # Operations, finance, logistics
+  - planning       # Strategy, design, architecture
+  - review         # Code review, document review, feedback
+  - meeting        # Scheduled meetings and discussions
+  - learning       # Training, courses, skill development
+  - other          # Everything else
+
+# Distraction Categories
+distraction_types:
+  - meeting        # Unscheduled meetings or calls
+  - notification   # Email, Slack, alerts
+  - question       # Colleague questions or requests
+  - context_switch # Switching between different work
+  - break          # Intentional breaks
+  - technical      # Technical issues, debugging tools
+  - other          # Other interruptions
+
+# Work Breakdown Settings
+work_breakdown:
+  complexity_threshold_minutes: 120  # Suggest breakdown for work > 2 hours
+  min_chunk_size_minutes: 30  # Minimum size for breakdown chunks
+  max_chunk_size_minutes: 120  # Maximum size for breakdown chunks
+
+# Estimation Settings
+estimation:
+  confidence_interval: 0.8  # 80% confidence interval for estimates
+  min_similar_samples: 3  # Minimum historical samples for estimates
+  recency_weight: 0.7  # Weight recent work more heavily (0-1)
+
+# Work Type Keywords (for auto-categorization)
+work_type_keywords:
+  technical:
+    - code
+    - api
+    - database
+    - deploy
+    - fix
+    - bug
+    - implement
+    - develop
+    - debug
+    - server
+    - dashboard
+    - dataset
+    - migration
+    - build
+    - configure
+  outreach:
+    - email
+    - contact
+    - reach
+    - meeting
+    - call
+    - follow
+    - introduce
+    - connect
+    - 1:1
+    - alignment
+    - collaborate
+    - sync
+  research:
+    - research
+    - study
+    - learn
+    - investigate
+    - analyze
+    - explore
+    - understand
+    - evaluate
+    - review
+    - documentation
+  writing:
+    - write
+    - draft
+    - document
+    - blog
+    - article
+    - report
+    - proposal
+    - outline
+    - strategy
+    - spec
+    - PRFAQ
+  admin:
+    - schedule
+    - organize
+    - expense
+    - invoice
+    - calendar
+    - filing
+    - spreadsheet
+    - metrics
+    - WBR
+  planning:
+    - design
+    - architecture
+    - plan
+    - roadmap
+    - strategy
+    - brainstorm
+  review:
+    - review
+    - feedback
+    - critique
+    - assess
+  meeting:
+    - meeting
+    - standup
+    - retrospective
+    - planning
+    - sync
+  learning:
+    - training
+    - course
+    - tutorial
+    - workshop
+    - certification

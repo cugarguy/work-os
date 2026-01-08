@@ -1,0 +1,41 @@
+{
+  "mcpServers": {
+    "workos": {
+      "command": "python3.11",
+      "args": [
+        "/Users/bsteeger/Documents/1-projects/-agents/workOS/core/mcp/server_simplified.py"
+      ],
+      "env": {
+        "MANAGER_AI_BASE_DIR": "/Users/bsteeger/Documents/1-projects/-agents/workOS"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_tasks",
+        "create_task",
+        "update_task_status",
+        "get_task_summary",
+        "check_priority_limits",
+        "get_system_status",
+        "process_notes_inbox",
+        "clear_backlog",
+        "prune_completed_tasks",
+        "create_knowledge",
+        "update_knowledge",
+        "search_knowledge",
+        "create_person",
+        "update_person",
+        "link_person_to_knowledge"
+      ]
+    },
+    "builder-mcp": {
+      "command": "builder-mcp",
+      "env": {},
+      "disabled": true,
+      "autoApprove": [
+        "ReadInternalWebsites",
+        "InternalSearch",
+        "BrazilBuildAnalyzerTool"
+      ]
+    }
+  }
+}

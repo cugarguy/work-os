@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "WorkOS Mark Task Done",
+  "description": "Mark a task as complete",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "#Tasks/\n\n1. Use list_tasks to show active tasks\n2. Ask me which task to mark as done\n3. Use update_task_status to mark it as 'd' (done)\n4. Confirm completion and show remaining P0/P1 tasks"
+  }
+}

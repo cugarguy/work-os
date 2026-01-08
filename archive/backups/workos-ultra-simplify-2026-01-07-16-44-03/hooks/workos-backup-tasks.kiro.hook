@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "WorkOS Backup Tasks",
+  "description": "Backup tasks to a timestamped folder",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Create a backup of the Tasks/ directory:\n\n1. Create a backup folder: backups/tasks-[YYYY-MM-DD-HH-MM]/\n2. Copy all files from Tasks/ to the backup folder\n3. Confirm backup created with file count\n4. List the 5 most recent backups"
+  }
+}

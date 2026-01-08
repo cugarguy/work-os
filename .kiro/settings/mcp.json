@@ -3,7 +3,7 @@
     "workos": {
       "command": "python3.11",
       "args": [
-        "/Users/bsteeger/Documents/1-projects/-agents/workOS/core/mcp/server.py"
+        "/Users/bsteeger/Documents/1-projects/-agents/workOS/core/mcp/server_ultra_simple.py"
       ],
       "env": {
         "MANAGER_AI_BASE_DIR": "/Users/bsteeger/Documents/1-projects/-agents/workOS"
@@ -12,32 +12,69 @@
       "autoApprove": [
         "list_tasks",
         "get_task_summary",
-        "process_backlog",
-        "process_backlog_with_dedup",
-        "process_backlog_smart",
-        "create_task",
-        "update_task_status",
-        "clear_backlog",
         "check_priority_limits",
-        "get_system_status",
-        "prune_completed_tasks",
-        "daily_checkin",
-        "get_time_estimates",
-        "view_time_analytics",
-        "view_distraction_analytics",
-        "update_session",
-        "get_session_status",
-        "end_session"
+        "create_task",
+        "create_knowledge",
+        "search_knowledge",
+        "create_person",
+        "link_person_to_knowledge"
       ]
     },
     "builder-mcp": {
       "command": "builder-mcp",
       "env": {},
-      "disabled": true,
+      "disabled": false,
       "autoApprove": [
         "ReadInternalWebsites",
         "InternalSearch",
         "BrazilBuildAnalyzerTool"
+      ],
+      "disabledTools": [
+        "ReadInternalWebsites",
+        "Delegate",
+        "WorkspaceSearch",
+        "CreatePackage",
+        "InternalSearch",
+        "SearchAcronymCentral",
+        "SimAddComment",
+        "ReadRemoteTestRun",
+        "RunIntegrationTest",
+        "BrazilBuildAnalyzerTool",
+        "BrazilPackageBuilderAnalyzerTool",
+        "CrCheckout",
+        "TaskeiGetTask",
+        "TaskeiGetRooms",
+        "TaskeiGetRoomResources",
+        "TaskeiListTasks",
+        "TaskeiUpdateTask",
+        "TaskeiCreateTask",
+        "MechanicDiscoverTools",
+        "MechanicDescribeTool",
+        "MechanicRunTool",
+        "MechanicSetUserInput",
+        "WorkspaceGitDetails",
+        "CRRevisionCreator",
+        "GKAnalyzeVersionSet",
+        "BrazilWorkspace",
+        "InternalCodeSearch",
+        "CheckFilepathForCAZ",
+        "OncallReadActions",
+        "GetDogmaClassification",
+        "GetDogmaRecommendations",
+        "TicketingReadActions",
+        "TicketingWriteActions",
+        "GetPipelinesRelevantToUser",
+        "GetPipelineHealth",
+        "GetPipelineDetails",
+        "BarristerEvaluationWorkflow",
+        "GetSasRisks",
+        "GetSasCampaigns",
+        "ApolloReadActions",
+        "SearchSoftwareRecommendations",
+        "GetSoftwareRecommendation",
+        "GetPolicyEngineRisk",
+        "GetPolicyEngineDashboard",
+        "ThirdPartyAnalysisGateway"
       ]
     }
   }

@@ -1,4 +1,123 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "id": "time_20260106_204231_269705",
+      "start_time": "2026-01-06T20:42:31.414835+00:00",
+      "end_time": "2026-01-06T20:42:37.159344+00:00",
+      "duration_minutes": 0,
+      "work_description": "Smitha 1:1 meeting - December priorities discussion",
+      "work_type": "collaborative",
+      "knowledge_refs": [],
+      "people_refs": [
+        "Smitha"
+      ],
+      "distractions": [],
+      "completion_percentage": 100,
+      "notes": "Key outcomes: 1) Nutanix docs published, What's New staged awaiting Bassem approval 2) Data analysis priorities confirmed: fix data access, continue S3 FGW, start VGW 3) Strategy document discussion - can include VGW deprecation, TGW revenue ride-out, S3 FGW to DataSync migration 4) WBR continuation question raised 5) New year ideas deferred until return from holidays"
+    },
+    {
+      "id": "time_20260106_204331_6dcd07",
+      "start_time": "2026-01-06T20:43:31.050027+00:00",
+      "end_time": "2026-01-06T20:43:35.673811+00:00",
+      "duration_minutes": 0,
+      "work_description": "Nutanix launch completion - What's New publication and final deliverables",
+      "work_type": "technical",
+      "knowledge_refs": [],
+      "people_refs": [],
+      "distractions": [],
+      "completion_percentage": 100,
+      "notes": "Successfully completed Nutanix launch by December 23 deadline. Got Bassem's approval and published What's New. All documentation and deliverables completed on schedule. P0 priority achieved."
+    },
+    {
+      "id": "time_20260106_204500_7b817e",
+      "start_time": "2026-01-06T20:45:00.129357+00:00",
+      "end_time": "2026-01-06T20:45:06.083242+00:00",
+      "duration_minutes": 0,
+      "work_description": "Return from PTO - email/Slack catch-up and task collection",
+      "work_type": "admin",
+      "knowledge_refs": [],
+      "people_refs": [],
+      "distractions": [],
+      "completion_percentage": 100,
+      "notes": "Full day catch-up after 12-day PTO. Reviewed emails and Slack. Collected 7 major work items: 1) Terraform backward compatibility issue 2) High-side FGW customer investigation 3) Ed's AL2→AL2023 migration doc review 4) Product pages Lorem Ipsum updates 5) China docs updates 6) Service metrics for LCK/DCA reports 7) Terraform as migration tool investment analysis. Key update: BI deferred data warehouse fix to 01/16."
+    },
+    {
+      "id": "time_20260107_160219_ca428d",
+      "start_time": "2026-01-07T16:02:19.014614+00:00",
+      "end_time": "2026-01-07T16:39:50.205215+00:00",
+      "duration_minutes": 37,
+      "work_description": "Console Near Term planning meeting attendance",
+      "work_type": "collaborative",
+      "knowledge_refs": [],
+      "people_refs": [],
+      "distractions": [],
+      "completion_percentage": 100,
+      "notes": "Console Near Term Planning meeting completed. Key outcomes: 1) Assigned ownership of Copy File Share Work project 2) Discussed PrivateLink FIPS release strategy - proposed dual release approach (January for Console+Classic, March for S3 FGW) 3) Action item to coordinate with Classic team (Shashi, Sajjad, Scott) on timeline and release strategy decision"
+    },
+    {
+      "id": "time_20260107_191145_043f71",
+      "start_time": "2026-01-07T19:11:45.692165+00:00",
+      "end_time": "2026-01-07T20:02:47.763265+00:00",
+      "duration_minutes": 51,
+      "work_description": "Phoenix sync meeting - multisite access architecture discussion",
+      "work_type": "collaborative",
+      "knowledge_refs": [],
+      "people_refs": [
+        "Shashi"
+      ],
+      "distractions": [],
+      "completion_percentage": 100,
+      "notes": "Phoenix sync meeting completed. Provided overview of current state based on research. Key outcome: Evaluating each service (VGW, TGW, S3 FGW) to determine strategic direction - options, impacts, and recommendations. Also exploring use cases for new investment/revenue streams. Target: Provide perspective and recommendations by end of Q1, assuming Smitha still expects this deliverable."
+    },
+    {
+      "id": "time_20260107_202039_93c22f",
+      "start_time": "2026-01-07T20:20:39.896339+00:00",
+      "end_time": "2026-01-07T20:20:44.932789+00:00",
+      "duration_minutes": 0,
+      "work_description": "Finance and BI team coordination - product hierarchy alignment for reporting",
+      "work_type": "collaborative",
+      "knowledge_refs": [],
+      "people_refs": [
+        "Minyan",
+        "Bhavesh"
+      ],
+      "distractions": [],
+      "completion_percentage": 100,
+      "notes": "Finance and BI coordination completed. Met with Minyan (Finance) first, then joint meeting with Bhavesh (BI). Successfully aligned data rows to product hierarchy for monthly/weekly/daily reporting goals mapping. Issue resolved for now."
+    },
+    {
+      "id": "time_20260107_202526_d20366",
+      "start_time": "2026-01-07T20:25:26.792525+00:00",
+      "end_time": "2026-01-07T20:25:33.012134+00:00",
+      "duration_minutes": 0,
+      "work_description": "AL2 to AL2023 migration communication strategy discussion with Shashi, Scott, Bassem",
+      "work_type": "collaborative",
+      "knowledge_refs": [],
+      "people_refs": [
+        "Shashi",
+        "Scott",
+        "Bassem"
+      ],
+      "distractions": [],
+      "completion_percentage": 100,
+      "notes": "AL2 deprecation communication strategy discussion completed. Key outcomes: 1) PHD notification issue resolved with corrective message 2) AL2 activation timeline clarified (March 1 final block, June 30 deprecation) 3) Customer communication approach debated - targeted vs broader notification 4) Agreement on documentation update as priority action 5) Strategic positioning on transparency vs confusion balance"
+    },
+    {
+      "id": "time_20260107_203116_b17b9e",
+      "start_time": "2026-01-07T20:31:16.070051+00:00",
+      "end_time": "2026-01-07T20:31:22.248723+00:00",
+      "duration_minutes": 0,
+      "work_description": "EDS Terraform migration automation project discussion with Prabir and Chris",
+      "work_type": "collaborative",
+      "knowledge_refs": [],
+      "people_refs": [
+        "Prabir",
+        "Chris"
+      ],
+      "distractions": [],
+      "completion_percentage": 100,
+      "notes": "EDS Terraform automation project discussion completed. Key outcomes: 1) Confirmed significant EDS-wide investment with Smitha/Jody alignment 2) Identified 400 internal VM migration need (Chris Glenn's team) 3) Discovered Hyper-V support gap 4) Requested access to SGW Terraform usage metrics 5) Added to EDS Asana board for collaboration 6) Strategic question answered - major investment confirmed with customer-driven approach"
+    }
+  ],
   "version": "1.0"
 }

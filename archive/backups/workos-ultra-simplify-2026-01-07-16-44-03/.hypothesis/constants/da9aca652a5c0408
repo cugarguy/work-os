@@ -1,0 +1,4 @@
+# file: /Users/bsteeger/Documents/1-projects/-agents/workOS/work-os/core/people_manager.py
+# hypothesis_version: 6.148.5
+
+[200, '%Y-%m-%d', '*.md', '---', 'People', '[<>:"/\\\\|?*]', '[[', '\\s+', ']]', 'content', 'context', 'created_date', 'expertise_areas', 'id', 'match_count', 'name', 'path', 'person', 'r', 'related_people', 'relationships', 'role', 'team', 'type', 'updated_date', 'utf-8']
